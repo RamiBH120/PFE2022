@@ -1,0 +1,265 @@
+<div class="container-fluid" >
+  <div class="row border border-3 rounded-bottom shadow-sm bg-body rounded">
+    <div>
+      <h4 class="p-3 fs-4 text-secondary text-center">Votre profile</h4>
+    </div>
+  </div>
+</div>
+
+<br>
+
+<div class="container-fluid" *ngIf="user">
+  <div class="row">
+    <div class="m-auto">
+      <div class="signup-form">
+        <form #loginForm="ngForm" action="" class="mt-2 border p-4 bg-light shadow">
+          <h4 class="mb-3 fs-4 text-secondary">Informations sur votre compte utilisateur</h4>
+          <div class="alert alert-danger text-center" *ngIf="msgerr">
+            {{msgerr}}</div>
+          <div class="alert alert-success text-center" *ngIf="msg">
+            {{msg}}</div>
+          <div class="row" >
+            <div class="col bordright mt-2">
+
+              <div class="row border border-3 rounded-3 m-1">
+              <div class="mb-3 col-md-6">
+                <label>Nom d'utilisateur <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="username" required [(ngModel)]="user.username" name="username"
+                       pattern="^([a-zA-Z]+\s)*[a-zA-Z_]{3,20}$"  #name="ngModel" autocomplete="off"
+                       [class.is-invalid]="name.invalid && name.touched">
+                <ng-container *ngIf="name.errors && (name.invalid && name.touched)">
+                  <small class="text-danger" *ngIf="name.errors?.['required']" >Nom d'utilisateur est obligatoire</small>
+                  <small class="text-danger" *ngIf="name.errors?.['pattern']" >Ce champ est invalide</small>
+                </ng-container>
+              </div>
+
+              <div class="mb-3 col-md-6">
+                <label>Matricule de l'utilisateur <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="matricule" required [(ngModel)]="user.matricule"
+                       name="matricule" pattern="^[0-9]{2,10}$"  #matricule="ngModel" autocomplete="off"
+                       [class.is-invalid]="matricule.invalid && matricule.touched" readonly>
+                <ng-container *ngIf="matricule.errors && (matricule.invalid && matricule.touched)">
+                  <small class="text-danger" *ngIf="matricule.errors?.['required']" >Ce champ est obligatoire!</small>
+                  <small class="text-danger" *ngIf="matricule.errors?.['pattern']" >Ce champ est invalide</small>
+                </ng-container>
+              </div>
+              </div>
+
+            <div class="row border border-3 rounded-3 m-1">
+            <div class="mb-3 col-md-6">
+              <label>Nom <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="firstname" [(ngModel)]="user.firstname" name="firstname" autocomplete="off"
+                     #first="ngModel" pattern="^([a-zA-Z]+\s)*[a-zA-Z]{3,50}$" required
+                     [class.is-invalid]="first.invalid && first.touched">
+              <ng-container *ngIf="first.errors && (first.invalid && first.touched)">
+                <small class="text-danger" *ngIf="first.errors?.['required']" >Nom est obligatoire!</small>
+                <small class="text-danger" *ngIf="first.errors?.['pattern']" >Nom invalide</small>
+              </ng-container>
+            </div>
+
+            <div class="mb-3 col-md-6">
+              <label>Prénom <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="lastname" [(ngModel)]="user.lastname" name="lastname" autocomplete="off"
+                     #last="ngModel" pattern="^([a-zA-Z]+\s)*[a-zA-Z]{3,50}$" required
+                     [class.is-invalid]="last.invalid && last.touched">
+              <ng-container *ngIf="last.errors && (last.invalid && last.touched)">
+                <small class="text-danger" *ngIf="last.errors?.['required']" >Prénom est obligatoire!</small>
+                <small class="text-danger" *ngIf="last.errors?.['pattern']" >Prénom invalide</small>
+              </ng-container>
+            </div>
+            </div>
+
+              <!-- -->
+
+
+
+              <div class="modal fade" id="exampleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h2 class="modal-title" id="exampleModalLabel">Récupération du mot de passe</h2>
+                      <button type="button" class="btn-close m-2" (click)="resetForm(mailForm.form)" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                      <form #mailForm="ngForm" class="p-3 mt-3 form-group">
+
+                        <div class="alert alert-danger mt-1" *ngIf="!networkStatus">Il parait que vous ne disposez pas d'un accés réseau!.</div>
+
+                        <div class="mb-3 col-md-6 m-auto">
+                          <label>Email</label>
+                          <input type="email" class="form-control" required
+                                 pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" ngModel
+                                 #email="ngModel" name="email" id="emailA" autocomplete="off"
+                                 [class.is-invalid]="email.invalid && email.touched"/>
+
+                        <ng-container *ngIf="email.errors && (email.invalid && email.touched)">
+                          <div class="alert alert-danger mt-1" *ngIf="email.errors?.['required']" >Ce champs est obligatoire!</div>
+                          <div class="alert alert-danger mt-1" *ngIf="email.errors?.['pattern']" >Email invalide</div>
+                        </ng-container>
+
+                    </div>
+                      </form>
+
+                    </div>
+                    <div class="modal-footer">
+                      <button [disabled]="mailForm.invalid || !networkStatus" (click)="checkMailandMat(email,matricule)" type="button" class="btn float-end hhh m-1" style="width: 350px" data-bs-target="#exampleModalMail" data-bs-toggle="modal">Envoyer un mail de récupération
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-key" viewBox="0 0 16 16">
+                          <path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10h-.535A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 2.712 4.285A.5.5 0 0 1 7.163 9h.63l.853-.854a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.793-.793-1-1h-6.63a.5.5 0 0 1-.451-.285A3 3 0 0 0 4 5z"/>
+                          <path d="M4 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                        </svg></button>
+                      <button type="button" class="btn float-end hhhrd m-1" (click)="resetForm(mailForm.form)" style="width: 150px" data-bs-dismiss="modal">Fermer
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                        </svg>
+                      </button>
+                    </div>
+
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="row border border-3 rounded-3 m-1">
+            <div class="mb-3 col-md-6">
+              <label>Adresse de l'utilisateur</label>
+              <input type="text" class="form-control" id="adresse" [(ngModel)]="user.adresse"  name="adresse" autocomplete="off"
+                     #adresse="ngModel" [class.is-invalid]="adresse.invalid" pattern="^([a-zA-Z0-9]+\s)*[a-zA-Z0-9_]{1,90}$">
+              <ng-container *ngIf="adresse.errors && (adresse.invalid && adresse.touched)">
+                <small class="text-danger" *ngIf="adresse.errors?.['pattern']" >Ce champ est invalide</small>
+              </ng-container>
+            </div>
+                <div class="mb-3 col-md-6">
+                  <label>Date de naissance de l'utilisateur </label>
+                  <input type="text" class="form-control" id="dateNaiss" [(ngModel)]="user.dateNaiss"  name="dateNaiss"
+                         placeholder="YYYY-MM-DD"
+                         onfocus="(this.type='date')"
+                         onblur="(this.type='text')"
+                         #dateNaiss="ngModel" [class.is-invalid]="dateNaiss.invalid" readonly>
+                </div>
+              </div>
+
+            <div class="row border border-3 rounded-3 m-1">
+            <div class="mb-3 col-md-6">
+              <label>Numéro de téléphone de l'utilisateur <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-prepend">
+                  <div class="input-group-text">(+216)</div>
+                </span>
+              <input type="text" class="form-control" id="phoneNumber" required [(ngModel)]="user.phoneNumber" name="phoneNumber"
+                     pattern="^[1-9][0-9]{7}$"  #tel="ngModel" autocomplete="off"
+                     [class.is-invalid]="tel.invalid && tel.touched">
+            </div>
+              <div *ngIf="tel.errors && (tel.invalid && tel.touched)">
+                <small class="text-danger" *ngIf="tel.errors?.['required']" >Ce champ est obligatoire!</small>
+                <small class="text-danger" *ngIf="tel.errors?.['pattern']" >Ce champ est invalide</small>
+              </div>
+
+            </div>
+
+            <div class="mb-3 col-md-6">
+              <label>Type d'utilisateur </label>
+              <select disabled type="text" class="form-select" aria-label="Disabled select example"
+                      id="type" [(ngModel)]="user.type"  name="type">
+                <option [value]="user.type">utilisateur</option>
+              </select>
+            </div>
+          </div>
+
+
+          </div>
+            <div class="col bordleft mt-2">
+
+              <div class="form-group border border-3 rounded-3 m-1">
+                <fieldset class="form-group m-1">
+                  <label>Image de profile </label>
+                  <br>
+                  <ng-container *ngIf="!isImageSaved">
+                  <small class="text-black">Cliquer sur l'image pour choisir ou modifier votre Image de profile </small>
+                  </ng-container>
+                  <ng-container *ngIf="isImageSaved">
+                    <small class="text-black">Cliquer sur Charger pour enregistrer cette image ou Annuler pour revenir à l'image précédente </small>
+                  </ng-container>
+                  <br>
+                  <small class="table-danger">{{imageError}}</small>
+                  <br>
+                  <div style="position: relative;left: 32%;">
+                  <div class="custom-file fileInputProfileWrap">
+                    <input type="file" id="image" #takeInput name="image" (change)="fileChangeEvent($event)" class="fileInputProfile" style="cursor: pointer">
+                    <div class="img-space">
+
+                      <ng-container *ngIf="isImageSaved; else elseTemplate">
+                        <img [src]="cardImageBase64"  alt=""/>
+                      </ng-container>
+                      <ng-template #elseTemplate>
+                        <ng-container *ngIf="user.image">
+                        <img [src]="retrievedImage" class="img-responsive" alt="Image de profile"></ng-container>
+                        <ng-container *ngIf="!user.image">
+                          <img src="../../../../../assets/profile-picture256.jpg" class="img-responsive" alt=""></ng-container>
+                      </ng-template>
+
+                    </div>
+
+                  </div>
+              </div>
+                  <div class="row" *ngIf="isImageSaved">
+                    <div class="col-md-6 m-auto" style="position: relative;left: 2%">
+                      <button class="btn hhhrd" style="width: 150px;position: relative;left: 25%" (click)="removeImage()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                        </svg>
+                        Annuler</button>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+
+
+            </div>
+          </div>
+          <br>
+          <hr style="border-bottom: 2px solid ;">
+          <div class="row">
+            <div class="col-md-6">
+              <button type="submit" [disabled]="loginForm.form.invalid" style="width: 250px" class="btn float-end hhh" data-bs-toggle="modal" data-bs-target="#exampleModalAdd">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                  <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+                </svg>
+                Modifier Votre compte</button>
+            </div>
+
+            <div class="modal fade" id="exampleModalAdd" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h2 class="modal-title" id="exampleModalLabelAdd">Modifier Votre Compte</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Etes-vous sur de modifier votre compte ?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                    <button type="button" class="btn yes" (click)="onUploadImgUpdate(loginForm)" data-bs-dismiss="modal">Oui</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <button class="btn hhhbl" style="width: 300px" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" (click)="checkNetworkStatus()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                </svg>
+                Changer le mot de passe
+              </button></div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+
+<br>

@@ -1,0 +1,1477 @@
+<div class="container-fluid" >
+  <div class="row border border-3 rounded-bottom shadow-sm bg-body rounded">
+    <div>
+      <h4 class="p-3 fs-4 text-secondary text-center">Planification des visites périodiques</h4>
+    </div>
+  </div>
+</div>
+<br><br>
+
+<div style="padding-left: 30px;">
+  <div *ngIf="agPrio==false && !selectedAgent && agent2.length == 1" class="alert alert-danger d-flex align-items-center" role="alert" style="width: 98%;"> <!-- width: 1475px; -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+      <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+    </svg>
+     Un agent est en état d'attente d'une planification!.
+  </div>
+
+  <div *ngIf="agPrio==false && !selectedAgent && agent2.length > 1" class="alert alert-danger d-flex align-items-center" role="alert" style="width: 98%;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+      <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+    </svg>
+     Des agents sont en état d'attente d'une planification!.
+  </div>
+</div>
+<br>
+
+
+<div class="row justify-content-between">
+  <div class="col-2" style="padding-left: 2em;">
+    <button class="btn impr" style="width: 140px"
+            data-bs-toggle="modal" data-bs-target="#exampleModalBS">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+        <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+        <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+      </svg>
+      Imprimer</button>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalBS" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="fw-bolder modal-title" style="color: #212E53" id="exampleModalLabelBS">Impression</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h3 class="fw-bolder" style="color: #0e457a">Imprimer les visites planifiés</h3>
+            <p>Cliquer ici pour imprimer
+              <button type="button" class="btn plan" (click)="exportNoNextPdf()" data-bs-dismiss="modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+                  <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                  <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                </svg>
+                Imprimer</button>
+            </p>
+            <hr>
+            <h3 class="fw-bolder" style="color: #725d05">Imprimer les visites replanifiés</h3>
+            <p>Cliquer ici pour imprimer
+              <button type="button" class="btn replan"  (click)="exportNextPdf()" data-bs-dismiss="modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+                  <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                  <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                </svg>
+                Imprimer</button></p>
+            <hr>
+            <h3 class="fw-bolder" style="color: #641313">Imprimer les visites dans la zone rouge</h3>
+            <p>Cliquer ici pour imprimer
+              <button type="button" class="btn rough"  (click)="exportRedZonePdf()" data-bs-dismiss="modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+                  <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                  <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                </svg>
+                Imprimer</button></p>
+            <hr>
+            <h3 class="fw-bolder" style="color: #076204">Imprimer les agents qui ont effectué leurs visites</h3>
+            <p>Cliquer ici pour imprimer
+              <button type="button" class="btn yes"  (click)="exportTruthlyVisitedPdf()" data-bs-dismiss="modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+                  <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                  <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                </svg>
+                Imprimer</button></p>
+            <hr>
+            <h3 class="fw-bolder" style="color: #4f4f4f">Imprimer les agents qui n'ont pas effectué leurs visites</h3>
+            <p>Cliquer ici pour imprimer
+              <button type="button" class="btn nop"  (click)="exportTruthlyNotVisitedPdf()" data-bs-dismiss="modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+                  <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                  <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                </svg>
+                Imprimer</button></p>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn stoped" data-bs-dismiss="modal">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+              </svg>
+              Annuler</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-3">
+    <mat-form-field class="example-full-width" style="width: 90% ;">
+      <input matInput placeholder="Chercher un agent" autocomplete="off" #name (keyup)="findMedecinByName(name)">
+    </mat-form-field>
+  </div>
+</div>
+
+<br>
+
+
+<!--table material angular-->
+<table mat-table [dataSource]="datasourceForAllAgent" class="mat-elevation-z8" style="width: 100%;">
+
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+  <ng-container matColumnDef="matsrtb">
+    <th mat-header-cell *matHeaderCellDef>MATR AGENT</th>
+    <td mat-cell *matCellDef="let element"> {{element.matsrtb}} </td>
+  </ng-container>
+
+  <!-- Position Column -->
+  <ng-container matColumnDef="direction">
+    <th mat-header-cell *matHeaderCellDef>DIRECTION AGENT</th>
+    <td mat-cell *matCellDef="let element"> {{element.direction}} </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="fonction">
+    <th mat-header-cell *matHeaderCellDef>FONCTION AGENT</th>
+    <td mat-cell *matCellDef="let element"> {{element.fonction}} </td>
+  </ng-container>
+
+  <!-- Weight Column -->
+  <ng-container matColumnDef="agence">
+    <th mat-header-cell *matHeaderCellDef>AGENCE AGENT</th>
+    <td mat-cell *matCellDef="let element"> {{element.agence.nomAgence}} </td>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="nom">
+    <th mat-header-cell *matHeaderCellDef>NOM AGENT</th>
+    <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="prenom">
+    <th mat-header-cell *matHeaderCellDef>PRENOM AGENT</th>
+    <td mat-cell *matCellDef="let element"> {{element.prenom}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="visNonRep">
+    <th mat-header-cell *matHeaderCellDef>DATE DE LA VISITE PLANIFIÉE</th>
+    <td mat-cell *matCellDef="let element"> {{element.visite.event == null ? 'en attente' : element.visite.event}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="visRep">
+    <th mat-header-cell *matHeaderCellDef>DATE DE LA VISITE REPLANIFIÉE</th>
+    <td mat-cell *matCellDef="let element"> {{element.visite.nextEvent== null ? 'en attente' : element.visite.nextEvent}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="visited">
+    <th mat-header-cell *matHeaderCellDef>VISITE ACCOMPLIE ?</th>
+    <td mat-cell *matCellDef="let element"> {{element.visite.visited == true ? 'Oui' : 'Non'}} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayColumnsFarAllAgent"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayColumnsFarAllAgent;" class="cursor"
+      [ngClass]="{'highlight':highlights()==row.matsrtb}"
+      (click)="onRowClickAgent(row)" (click)="setView(CalendarView.Month)" mwlCalendarToday
+      [(viewDate)]="viewDate"></tr>
+</table>
+
+
+<!--pagination of table-->
+<mat-paginator [length]="100"
+               [pageSize]="3"
+               [pageSizeOptions]="[1,3, 6 , 9 , 12]">
+</mat-paginator>
+
+<br><br>
+<div class="row justify-content-between" style="padding-left: 20px;">
+<div class="col-1">
+  <button class="btn ssss" style="width: 310px;" (click)="score()" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-fill" viewBox="0 0 16 16">
+      <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5h16V4H0V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5z"/>
+    </svg>
+    Afficher le Calendrier
+  </button></div>
+
+<div class="col-sm-3" style="padding-left: 2.5em;" >
+  <button class="btn sssss" style="width: 310px;" type="button" [disabled]="!selectedAgent" (click)="cancelAgentSelect() " (click)="setView(CalendarView.Month)" mwlCalendarToday
+          [(viewDate)]="viewDate">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+    </svg>
+    Annuler la sélection
+  </button></div>
+</div>
+
+
+<br><br>
+
+
+<div class="collapse" id="collapseExample">
+  <div style="position: relative;left: 10px;">
+    <div style="padding-left: 3rem;position:absolute;top:3px;">
+      <label>Visite planifiée</label>
+    </div>
+    <div class="cp_wrapper mb-3">
+      <input type="color" name="cp_1" value="#1e90ff" />
+    </div>
+    <div style="padding-left: 3rem;position:absolute;top:50px;">
+      <label>Visite replanifiée</label>
+    </div>
+    <div class="cp_wrapper">
+      <input type="color" name="cp_2" value="#e3bc08" />
+    </div>
+    <div style="padding-left: 3rem;position:absolute;top:93px;">
+      <label>Visite dans la zone rouge</label>
+    </div>
+    <div class="cp_wrapper">
+      <input type="color" name="cp_3" value="#ad2121" />
+    </div>
+  </div>
+  <ng-container *ngIf="!selectedAgent">
+<br xmlns:locale="http://www.w3.org/1999/xhtml" xmlns:firstDayOfWeek="http://www.w3.org/1999/xhtml"><br><br>
+<div class="row text-center" style="position: relative;left: 10px;">
+  <div class="col-md-4">
+    <div class="btn-group">
+      <div *ngIf="prece == true && aujour == false && suiv == false"
+        class="btn waiteded2"
+        mwlCalendarPreviousView
+        [view]="view"
+        [(viewDate)]="viewDate"
+        [excludeDays]="excludeDays"
+        (viewDateChange)="closeOpenMonthViewDay()"
+        (click)="Prece()"
+      >
+        <- Précédent
+      </div>
+      <div *ngIf="prece == false && aujour == true && suiv == false"
+           class="btn waiteded22"
+           mwlCalendarPreviousView
+           [view]="view"
+           [(viewDate)]="viewDate"
+           [excludeDays]="excludeDays"
+           (viewDateChange)="closeOpenMonthViewDay()"
+           (click)="Prece()"
+      >
+        <- Précédent
+      </div>
+      <div *ngIf="prece == false && aujour == false && suiv == true"
+           class="btn waiteded22"
+           mwlCalendarPreviousView
+           [view]="view"
+           [(viewDate)]="viewDate"
+           [excludeDays]="excludeDays"
+           (viewDateChange)="closeOpenMonthViewDay()"
+           (click)="Prece()"
+      >
+        <- Précédent
+      </div>
+      <div *ngIf="prece == false && aujour == true && suiv == false"
+        class="btn waiteded2"
+        mwlCalendarToday
+        [(viewDate)]="viewDate"
+        (click)="Aujour()"
+      >
+        Aujourd'hui
+      </div>
+      <div *ngIf="prece == true && aujour == false && suiv == false"
+           class="btn waiteded22"
+           mwlCalendarToday
+           [(viewDate)]="viewDate"
+           (click)="Aujour()"
+      >
+        Aujourd'hui
+      </div>
+      <div *ngIf="prece == false && aujour == false && suiv == true"
+           class="btn waiteded22"
+           mwlCalendarToday
+           [(viewDate)]="viewDate"
+           (click)="Aujour()"
+      >
+        Aujourd'hui
+      </div>
+      <div *ngIf="prece == false && aujour == false && suiv == true"
+        class="btn waiteded2"
+        mwlCalendarNextView
+        [view]="view"
+        [(viewDate)]="viewDate"
+        [excludeDays]="excludeDays"
+        (viewDateChange)="closeOpenMonthViewDay()"
+        (click)="Suiv()"
+      >
+        Suivant ->
+      </div>
+      <div *ngIf="prece == false && aujour == true && suiv == false"
+           class="btn waiteded22"
+           mwlCalendarNextView
+           [view]="view"
+           [(viewDate)]="viewDate"
+           [excludeDays]="excludeDays"
+           (viewDateChange)="closeOpenMonthViewDay()"
+           (click)="Suiv()"
+      >
+        Suivant ->
+      </div>
+      <div *ngIf="prece == true && aujour == false && suiv == false"
+           class="btn waiteded22"
+           mwlCalendarNextView
+           [view]="view"
+           [(viewDate)]="viewDate"
+           [excludeDays]="excludeDays"
+           (viewDateChange)="closeOpenMonthViewDay()"
+           (click)="Suiv()"
+      >
+        Suivant ->
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale:weekStartsOn:excludeDays }}</h3>
+  </div>
+  <div class="col-md-4">
+    <span style="padding-left: 120px;"></span>
+    <div class="btn-group">
+      <div *ngIf="mois == true && semaine == false"
+        class="btn waiteded2"
+        (click)="setView(CalendarView.Month)"
+        (click)="Mois()"
+        [class.active]="view === CalendarView.Month"
+      >
+        Mois
+      </div>
+      <div *ngIf="mois == false && semaine == true"
+           class="btn waiteded"
+           (click)="setView(CalendarView.Month)"
+           (click)="Mois()"
+           [class.active]="view === CalendarView.Month"
+      >
+        Mois
+      </div>
+      <div *ngIf="mois == true && semaine == false"
+        class="btn waiteded"
+        (click)="setView(CalendarView.Week)"
+        (click)="Semaine()"
+        [class.active]="view === CalendarView.Week"
+      >
+        Semaine
+      </div>
+      <div *ngIf="mois == false && semaine == true"
+           class="btn waiteded2"
+           (click)="setView(CalendarView.Week)"
+           (click)="Semaine()"
+           [class.active]="view === CalendarView.Week"
+      >
+        Semaine
+      </div>
+    </div>
+  </div>
+</div>
+<br />
+<div [ngSwitch]="view">
+  <mwl-calendar-month-view
+    data-bs-toggle="modal" data-bs-target="#exampleModalPop"
+    *ngSwitchCase="CalendarView.Month"
+    [viewDate]="viewDate"
+    [events]="events"
+    [refresh]="refresh"
+    [locale]="locale"
+    [excludeDays]="excludeDays"
+    (eventTimesChanged)="eventTimesChanged($any($event))"
+    (eventClicked)="handleEvent('Clicked', $event.event)"
+    (dayClicked)="dayClickedEventAndNextEvent($event.day)"
+  >
+  </mwl-calendar-month-view>
+  <!-- Modal -->
+  <div class="modal fade"  data-bs-keyboard="false" data-bs-backdrop="static" id="exampleModalPop"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="exampleModalLabelPop">Chargement des visites</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="cancelClick()"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <div style="padding-left: 170px;">
+          <mat-button-toggle-group  #group="matButtonToggleGroup" aria-label="Font Style">
+              <mat-button-toggle *ngIf="(clickEvented.length != 0 && clickNextEvented.length == 0 && clickNextEvented2.length == 0) ||
+                                 (clickEvented.length != 0 && clickNextEvented.length != 0 && clickNextEvented2.length == 0) ||
+                                 (clickEvented.length != 0 && clickNextEvented.length == 0 && clickNextEvented2.length != 0) ||
+                                 (clickEvented.length != 0 && clickNextEvented.length != 0 && clickNextEvented2.length != 0)" class="blue"
+                                 checked value="Non Replanifier" (click)="cancelClickForReplanfier()">Visite planifiée</mat-button-toggle>
+            <mat-button-toggle *ngIf="clickEvented.length==0"
+                               value="Non Replanifier" disabled >Visite planifiée</mat-button-toggle>
+
+              <mat-button-toggle *ngIf="(clickEvented.length == 0 && clickNextEvented.length != 0 && clickNextEvented2.length == 0) ||
+            (clickEvented.length == 0 && clickNextEvented.length != 0 && clickNextEvented2.length != 0)" class="yellow"
+                                 checked value="Replanifier" (click)="cancelClickForNonReplanifier()">Visite replanifiée</mat-button-toggle>
+
+              <mat-button-toggle *ngIf="clickNextEvented.length==0" disabled>Visite replanifiée</mat-button-toggle>
+              <mat-button-toggle *ngIf="(clickEvented.length != 0 && clickNextEvented != 0 && clickNextEvented2 != 0)
+               || (clickEvented.length != 0 && clickNextEvented != 0 && clickNextEvented2 == 0)" class="yellow"
+                                 value="Replanifier" (click)="cancelClickForNonReplanifier()">Visite replanifiée</mat-button-toggle>
+
+              <mat-button-toggle *ngIf="(clickEvented.length == 0 && clickNextEvented.length == 0 && clickNextEvented2.length != 0)"
+                                 class="red" checked value="ZoneRouge"
+                                 (click)="cancelClickForZoneRouge()">Visite dans la zone rouge</mat-button-toggle>
+              <mat-button-toggle *ngIf="(clickEvented.length != 0 && clickNextEvented2 != 0) || (clickNextEvented.length != 0 && clickNextEvented2 != 0)"
+                                 value="ZoneRouge" class="red"
+                                 (click)="cancelClickForZoneRouge()">Visite dans la zone rouge</mat-button-toggle>
+            <mat-button-toggle *ngIf="clickNextEvented2.length==0" value="ZoneRouge" disabled>Visite dans la zone rouge</mat-button-toggle>
+
+          </mat-button-toggle-group>
+          </div>
+          <br>
+
+          <div *ngIf="group.value=='Non Replanifier'">
+            <h3>Visite planifiée :</h3>
+           <cdk-virtual-scroll-viewport itemSize="40" style="height: 200px;">
+            <table mat-table [dataSource]="datasourceClickEvent" class="mat-elevation-z8" style="width: 100%;" multiTemplateDataRows>
+
+
+              <ng-container matColumnDef="matsrtb">
+                <th mat-header-cell *matHeaderCellDef>MATR S.R.T.B</th>
+                <td mat-cell *matCellDef="let element"> {{element.matsrtb}} </td>
+              </ng-container>
+
+
+              <ng-container matColumnDef="direction">
+                <th mat-header-cell *matHeaderCellDef> DIRECTION</th>
+                <td mat-cell *matCellDef="let element"> {{element.direction}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="fonction">
+                <th mat-header-cell *matHeaderCellDef>FONCTION</th>
+                <td mat-cell *matCellDef="let element"> {{element.fonction}} </td>
+              </ng-container>
+
+
+              <ng-container matColumnDef="nom">
+                <th mat-header-cell *matHeaderCellDef>NOM</th>
+                <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="prenom">
+                <th mat-header-cell *matHeaderCellDef>PRENOM</th>
+                <td mat-cell *matCellDef="let element"> {{element.prenom}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="event">
+                <th mat-header-cell *matHeaderCellDef>DATE DE LA VISITE PLANIFIÉE</th>
+                <td mat-cell *matCellDef="let element"> {{element.visite.event}} </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumnsEvent"></tr>
+              <tr mat-row *matRowDef="let row1; columns: displayedColumnsEvent;" class="cursor"
+                  [ngClass]="{'highlight2': highlightEvent()==row1.matsrtb}"
+                  (click)="OnRowClickedEvent(row1,updateForm)"></tr>
+            </table>
+           </cdk-virtual-scroll-viewport>
+          </div>
+          <br>
+          <div *ngIf="group.value=='Replanifier'">
+            <h3>Visite replanifiée : </h3>
+            <cdk-virtual-scroll-viewport itemSize="40" style="height: 200px;">
+              <table mat-table [dataSource]="datasourceClickNextEvent" class="mat-elevation-z8" style="width: 100%;" multiTemplateDataRows>
+
+
+                <ng-container matColumnDef="matsrtb">
+                  <th mat-header-cell *matHeaderCellDef>MATR S.R.T.B</th>
+                  <td mat-cell *matCellDef="let element"> {{element.matsrtb}} </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="direction">
+                  <th mat-header-cell *matHeaderCellDef> DIRECTION</th>
+                  <td mat-cell *matCellDef="let element"> {{element.direction}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="fonction">
+                  <th mat-header-cell *matHeaderCellDef>FONCTION</th>
+                  <td mat-cell *matCellDef="let element"> {{element.fonction}} </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="nom">
+                  <th mat-header-cell *matHeaderCellDef>NOM</th>
+                  <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="prenom">
+                  <th mat-header-cell *matHeaderCellDef>PRENOM</th>
+                  <td mat-cell *matCellDef="let element"> {{element.prenom}} </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="Nextevent">
+                  <th mat-header-cell *matHeaderCellDef>DATE DE LA VISITE REPLANIFIÉE</th>
+                  <td mat-cell *matCellDef="let element"> {{element.visite.nextEvent}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsNextEvent"></tr>
+                <tr mat-row *matRowDef="let row1; columns: displayedColumnsNextEvent;" class="cursor"
+                    [ngClass]="{'highlight1': highlightNextEvent()==row1.matsrtb}"
+                    (click)="OnRowClickedNextEvent(row1,updateForm)"></tr>
+              </table>
+            </cdk-virtual-scroll-viewport>
+          </div>
+          <br>
+          <br>
+          <div *ngIf="group.value=='ZoneRouge'">
+            <h3>Visite dans la zone rouge : </h3>
+            <cdk-virtual-scroll-viewport itemSize="40" style="height: 200px;">
+              <table mat-table [dataSource]="datasourceNext2" class="mat-elevation-z8" style="width: 100%;" multiTemplateDataRows>
+
+
+                <ng-container matColumnDef="matsrtb">
+                  <th mat-header-cell *matHeaderCellDef>MATR S.R.T.B</th>
+                  <td mat-cell *matCellDef="let element"> {{element.matsrtb}} </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="direction">
+                  <th mat-header-cell *matHeaderCellDef> DIRECTION</th>
+                  <td mat-cell *matCellDef="let element"> {{element.direction}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="fonction">
+                  <th mat-header-cell *matHeaderCellDef>FONCTION</th>
+                  <td mat-cell *matCellDef="let element"> {{element.fonction}} </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="nom">
+                  <th mat-header-cell *matHeaderCellDef>NOM</th>
+                  <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="prenom">
+                  <th mat-header-cell *matHeaderCellDef>PRENOM</th>
+                  <td mat-cell *matCellDef="let element"> {{element.prenom}} </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="Nextevent">
+                  <th mat-header-cell *matHeaderCellDef>DATE DE LA VISITE REPLANIFIÉE</th>
+                  <td mat-cell *matCellDef="let element"> {{element.visite.nextEvent}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsNextEvent2"></tr>
+                <tr mat-row *matRowDef="let row1; columns: displayedColumnsNextEvent2;" class="cursor"
+                    [ngClass]="{'highlight3': highlightNextEvent()==row1.matsrtb}"
+                    (click)="OnRowClickedNextEvent(row1,updateForm)"></tr>
+              </table>
+            </cdk-virtual-scroll-viewport>
+          </div>
+          <br>
+          <form #updateForm="ngForm">
+            <div *ngIf="selectEvent && !selectNextEvent && group.value=='Non Replanifier'">
+              <div style="padding-left: 220px;">
+                <mat-button-toggle-group  #UpDele="matButtonToggleGroup" aria-label="Font Style">
+                  <mat-button-toggle value="Modifier Evenement" class="blue" (click)="clickForUpdate()">Replanifier la visite</mat-button-toggle>
+                  <mat-button-toggle value="Supprimer Evenement" class="blue" (click)="CompareDatesSupp()">Supprimer la visite</mat-button-toggle>
+                </mat-button-toggle-group>
+              </div>
+              <br>
+              <div *ngIf="UpDele.value=='Modifier Evenement'">
+                <br>
+              <label>Est-ce qu'(il/elle) accomplit sa visite ?</label> <br><br>
+              <mat-radio-group ngModel="{{selectEvent.visite.visited}}" name="visited" #isVisited="ngModel" required
+                               aria-label="Select an option">
+                <mat-radio-button  value="true" color="primary" [disabled]="CompareDatesForVisite()==true">Oui</mat-radio-button><span style="padding-left: 2em"></span>
+                <mat-radio-button value="false" color="primary" [disabled]="selectEvent.visite.visited==true">Non</mat-radio-button>
+              </mat-radio-group>
+              <div *ngIf="isVisited.errors && (isVisited.invalid && isVisited.touched)">
+                <small class="text-danger" *ngIf="isVisited.errors?.['required']" >Ce champ est obligatoire!</small>
+              </div>
+              <br>
+              <div *ngIf="isVisited.value == 'false' && CompareDatesForVisite()==false">
+                <br>
+                <label>Date de nouvelle visite :<span class="text-danger">*</span></label> <br>
+                <mat-form-field>
+                  <input matInput [matDatepickerFilter]="myFilter" [min]="ddEventForSelect && dates"
+                         [max]="ddEvent"
+                         (ngModelChange)=" ExistUpdateEvent(nextEvent.value)"
+                         (ngModelChange)="ExistUpdateNextEvent(nextEvent.value)"
+                         (ngModelChange)="CompareDates(nextEvent.value)"
+                         (ngModelChange)="calculBetweenDayse(nextEvent.value)"
+                         (ngModelChange)="ExistForm(nextEvent.value)"
+                         [matDatepicker]="$any(myDateEvent)" ngModel #nextEvent="ngModel" name="nextEvent" placeholder="YYYY-MM-DD" readonly>
+                  <mat-datepicker-toggle matSuffix [for]="myDateEvent"></mat-datepicker-toggle>
+                  <mat-datepicker #myDateEvent (opened)="streamOpened($event)"
+                                  [dateClass]="dateClass" panelClass="endDate"></mat-datepicker>
+                </mat-form-field>
+                <div *ngIf="!selectNextEvent && selectEvent && nextEvent.value">
+                  <small class="text-danger" *ngIf="((exiUpdateEve==true || exiUpdateNextEve==true) && (compareDate==true))">
+                    Il existe des agents qui ont déjà la même (agence,fonction('chaufeur')).</small><br>
+                  <small class="text-danger" *ngIf="(compareDate==false)"><br>
+                    La visite actuelle est déjà sa visite.</small>
+                  <small class="text-danger">{{stre}}</small>
+                </div>
+                <hr>
+                <div *ngIf="isVisited.value == 'false'">
+                  <h3>Voulez-vous vraiment replanifier cette visite ? <button *ngIf="group.value=='Non Replanifier'" type="button" class="btn green" data-bs-dismiss="modal" [disabled]="bolli==true || leted==false || !selectEvent || leted==null || !nextEvent.value || ((exiUpdateEve==true || exiUpdateNextEve==true) && (compareDate==true)) || (compareDate==false) || isVisited.value == 'false' && CompareDatesForVisite()==true && selectEvent.visite.visited == false " (click)="updatNextEventNonReplanfifier(updateForm)" >Oui</button> <span style="padding-left: 12px;"></span>   <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick()">Non</button></h3>
+                </div>
+              </div>
+                <hr *ngIf="isVisited.value == 'true'">
+                <div *ngIf="isVisited.value == 'true'">
+                  <h3>Voulez-vous vraiment accomplir cette visite ? <button *ngIf="group.value=='Non Replanifier'" type="button" class="btn green" data-bs-dismiss="modal" (click)="updatNextEventNonReplanfifier(updateForm)" >Oui</button> <span style="padding-left: 12px;"></span>   <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick()">Non</button></h3>
+                </div>
+              </div>
+              <br>
+              <div *ngIf="UpDele.value == 'Supprimer Evenement'">
+                <div class="alert alert-primary" role="alert">
+                  Une visite ne peut pas être supprimée si vous dépassez sa date — Attention !
+                </div>
+                <hr>
+                <div>
+                  <h3>Voulez-vous vraiment supprimer cette visite ? <button *ngIf="group.value=='Non Replanifier'" [disabled]="bolli==false || leted==true || !selectEvent || leted==null" type="button" class="btn green" data-bs-dismiss="modal" (click)="UpdateForDelete2()">Oui</button> <span style="padding-left: 12px;"></span>   <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick()">Non</button></h3>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="(selectNextEvent && !selectEvent && group.value=='Replanifier') || (selectNextEvent && !selectEvent && group.value=='ZoneRouge')">
+              <div style="padding-left: 220px;">
+                <mat-button-toggle-group  #UpDele="matButtonToggleGroup" aria-label="Font Style">
+                  <mat-button-toggle *ngIf="group.value=='Replanifier'" class="yellow" value="Modifier Evenement" (click)="clickForUpdate()">Replanifier la visite</mat-button-toggle>
+                  <mat-button-toggle *ngIf="group.value=='Replanifier'" class="yellow" value="Supprimer Evenement" (click)="CompareDatesSupp()">Supprrimer la visite</mat-button-toggle>
+                  <mat-button-toggle *ngIf="group.value=='ZoneRouge'" class="red" value="Modifier Evenement" (click)="clickForUpdate()">Replanifier la visite</mat-button-toggle>
+                  <mat-button-toggle *ngIf="group.value=='ZoneRouge'" class="red" value="Supprimer Evenement" (click)="CompareDatesSupp()">Supprrimer la visite</mat-button-toggle>
+                </mat-button-toggle-group>
+              </div>
+              <br>
+              <div *ngIf="UpDele.value=='Modifier Evenement'">
+                <br>
+              <label>Est-ce qu'(il/elle) accomplit sa visite ?</label> <br><br>
+              <mat-radio-group ngModel="{{selectNextEvent.visite.visited}}" name="visited" #isVisited="ngModel" required
+                               aria-label="Select an option">
+                <mat-radio-button  value="true" color="primary" [disabled]="CompareDatesForVisite()==true">Oui</mat-radio-button><span style="padding-left: 2em"></span>
+                <mat-radio-button value="false" color="primary" [disabled]="selectNextEvent.visite.visited == true">Non</mat-radio-button>
+              </mat-radio-group>
+              <div *ngIf="isVisited.errors && (isVisited.invalid && isVisited.touched)">
+                <small class="text-danger" *ngIf="isVisited.errors?.['required']" >Ce champ est obligatoire!</small>
+              </div>
+
+              <br>
+                <div *ngIf="isVisited.value == 'false' && CompareDatesForVisite()==false">
+                  <br>
+                  <label>Date de nouvelle visite :<span class="text-danger">*</span></label> <br>
+                  <mat-form-field>
+                    <input matInput [matDatepickerFilter]="myFilter" [min]="ddEventForSelectNext && dates"
+                           [max]="ddNext"
+                           (ngModelChange)=" ExistUpdateEventForNext(nextEvent.value)"
+                           (ngModelChange)="ExistUpdateNextEventForNext(nextEvent.value)"
+                           (ngModelChange)="CompareDatesForNext(nextEvent.value)"
+                           (ngModelChange)="calculBetweenDays(nextEvent.value)"
+                           (ngModelChange)="ExistForm(nextEvent.value)"
+                           [matDatepicker]="$any(myDate)" ngModel #nextEvent="ngModel" name="nextEvent" placeholder="YYYY-MM-DD" readonly>
+                    <mat-datepicker-toggle matSuffix [for]="myDate"></mat-datepicker-toggle>
+                    <mat-datepicker #myDate (opened)="streamOpened($event)" [dateClass]="dateClass"
+                                    panelClass="endDate"></mat-datepicker>
+                  </mat-form-field>
+                  <div *ngIf="selectNextEvent && !selectEvent && nextEvent.value">
+                    <small class="text-danger" *ngIf="((exiUpdateEveForNext==true || exiUpdateNextEveForNext==true) && (compareDateForNext==true))">
+                      Il existe des agents qui ont déjà la même (agence,fonction('chaufeur')).</small><br>
+                    <small class="text-danger" *ngIf="(compareDateForNext==false)">
+                      La visite actuelle est déjà sa visite.</small><br>
+                    <small class="text-danger">{{str}}</small>
+                  </div>
+                  <hr>
+                  <div *ngIf="isVisited.value=='false'">
+                    <h3>Voulez-vous vraiment replanifier cette visite ? <button *ngIf="((group.value=='Replanifier') || (group.value=='ZoneRouge'))" type="button" class="btn green" data-bs-dismiss="modal" [disabled]="bolli==true || leted==false || !selectNextEvent || leted==null || !nextEvent.value || ((exiUpdateEveForNext==true || exiUpdateNextEveForNext==true) && (compareDateForNext==true)) || (compareDateForNext==false) || isVisited.value == 'false' && CompareDatesForVisite()==true && selectNextEvent.visite.visited == false "   (click)="updatNextEventReplanfifier(updateForm)">Oui</button> <span style="padding-left: 12px;"></span>   <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick()">Non</button> </h3>
+                  </div>
+                </div>
+                <hr *ngIf="isVisited.value=='true'">
+                <div *ngIf="isVisited.value=='true'">
+                  <h3>Voulez-vous vraiment accomplir cette visite ? <button *ngIf="((group.value=='Replanifier') || (group.value=='ZoneRouge'))" type="button" class="btn green" data-bs-dismiss="modal" (click)="updatNextEventReplanfifier(updateForm)">Oui</button> <span style="padding-left: 12px;"></span>   <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick()">Non</button> </h3>
+                </div>
+                </div>
+              <br>
+              <div *ngIf="UpDele.value == 'Supprimer Evenement'">
+                <div class="alert alert-primary" role="alert">
+                  Une visite ne peut pas être supprimée si vous dépassez sa date — Attention !
+                </div>
+                <hr>
+                <div>
+                 <h3> Voulez-vous vraiment supprimer cette visite ? <button *ngIf="(group.value=='Replanifier') || (group.value=='ZoneRouge')" [disabled]="bolli == false || leted==true || !selectNextEvent || leted==null" type="button" class="btn green" data-bs-dismiss="modal" (click)="UpdateForDelete()">Oui</button><span style="padding-left: 12px;"></span>    <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick()">Non</button></h3>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn stop" data-bs-dismiss="modal" (click)="cancelClick()">Annuler</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <mwl-calendar-week-view
+    data-bs-toggle="modal" data-bs-target="#exampleModalPop"
+    *ngSwitchCase="CalendarView.Week"
+    [viewDate]="viewDate"
+    [events]="events"
+    [refresh]="refresh"
+    [locale]="locale"
+    [excludeDays]="excludeDays"
+    (eventTimesChanged)="eventTimesChanged($any($event))"
+    (dayHeaderClicked)="dayClickedEventAndNextEvent($any($event.day))"
+    (eventClicked)="handleEvent('Clicked', $event.event)"
+    [hourSegments]="0"
+  >
+  </mwl-calendar-week-view>
+  <mwl-calendar-day-view
+    *ngSwitchCase="CalendarView.Day"
+    [viewDate]="viewDate"
+    [events]="events"
+    [refresh]="refresh"
+    [locale]="locale"
+    (eventClicked)="handleEvent('Clicked', $event.event)"
+    (eventTimesChanged)="eventTimesChanged($event)"
+  >
+  </mwl-calendar-day-view>
+</div>
+
+<br /><br /><br />
+
+<div style="padding-right: 10px;">
+  <button class="btn sssse float-end" (click)="getAllAgentByPriority()" data-bs-toggle="modal" data-bs-target="#exampleModalPopSele">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+    </svg>
+    Planifier une nouvelle visite
+  </button>
+  <div class="clearfix"></div>
+</div>
+<br>
+
+
+<!-- Modal -->
+<div class="modal fade" data-bs-keyboard="false" data-bs-backdrop="static" id="exampleModalPopSele"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="exampleModalLabelPopSele">Chargement des agents</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="cancelClick2()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div>
+          <h3>Les agents par priorité des dates : </h3>
+        </div>
+
+        <cdk-virtual-scroll-viewport itemSize="40" style="height: 200px;">
+          <table mat-table [dataSource]="datasource"  class="mat-elevation-z8" style="width: 100%;" multiTemplateDataRows>
+
+
+            <ng-container matColumnDef="matsrtb">
+              <th mat-header-cell *matHeaderCellDef>MATR S.R.T.B</th>
+              <td mat-cell *matCellDef="let element"> {{element.matsrtb}} </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="direction">
+              <th mat-header-cell *matHeaderCellDef> DIRECTION</th>
+              <td mat-cell *matCellDef="let element"> {{element.direction}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="fonction">
+              <th mat-header-cell *matHeaderCellDef>FONCTION</th>
+              <td mat-cell *matCellDef="let element"> {{element.fonction}} </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="nom">
+              <th mat-header-cell *matHeaderCellDef>NOM</th>
+              <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="prenom">
+              <th mat-header-cell *matHeaderCellDef>PRENOM</th>
+              <td mat-cell *matCellDef="let element"> {{element.prenom}} </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="visite">
+              <th mat-header-cell *matHeaderCellDef>DEBUT DE LA VISITE</th>
+              <td mat-cell *matCellDef="let element"> {{element.visite.nextdate}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="visitePro">
+              <th mat-header-cell *matHeaderCellDef>FIN DE LA VISITE </th>
+              <td mat-cell *matCellDef="let element"> {{element.visite.lastdate}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor"
+                [ngClass]="{'highlight': highlight()==row.matsrtb}"
+            (click)="OnRowClicked(row,addForm)"></tr>
+
+          </table>
+        </cdk-virtual-scroll-viewport>
+        <br>
+        <form #addForm="ngForm">
+          <h4 class="mb-5 fs-5 text-secondary" *ngIf="selectedRow">Planification d'une visite pour : " {{selectedRow.nom}} {{selectedRow.prenom}} "</h4>
+          <br>
+          <div *ngIf="selectedRow">
+            <label>Date de la visite planifiée:</label><br>
+
+            <mat-form-field>
+              <input matInput [matDatepickerFilter]="myFilter" [min]="selectedRow.visite.nextdate && dates"
+                     [max]="dd"
+                     [matDatepicker]="$any(myDatePicker)" ngModel #event="ngModel" name="event"
+                     (ngModelChange)=" ExistNextEvent(event.value)"
+                     (ngModelChange)="ExistEvent(event.value)"
+                     (ngModelChange)="ExistForm(event.value)" placeholder="YYYY-MM-DD" readonly>
+              <mat-datepicker-toggle matSuffix [for]="myDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #myDatePicker (opened)="streamOpened($event)" [dateClass]="dateClass"
+                              panelClass="endDate"></mat-datepicker>
+            </mat-form-field>
+            <div *ngIf="selectedRow && event.value">
+              <small class="text-danger" *ngIf="((exiEve==true || exiNextEve==true))">
+                Il existe des agents qui ont déjà la même (agence,fonction('chaufeur')).</small>
+            </div>
+            <hr *ngIf="selectedRow && event.value">
+            <div *ngIf="selectedRow && event.value">
+              <h3> Voulez-vous vraiment ajouter cette visite ? <button type="button" class="btn green" data-bs-dismiss="modal" [disabled]="exiEve==true || exiNextEve==true || !selectedRow || !event.value" (click)="addEvent(addForm)">Oui</button><span style="padding-left: 12px;"></span>  <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick2()">Non</button></h3>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn stop " data-bs-dismiss="modal" (click)="cancelClick2()">Annuler</button>
+      </div>
+    </div>
+  </div>
+ </div>
+ </ng-container>
+  <ng-container *ngIf="selectedAgent">
+    <br xmlns:locale="http://www.w3.org/1999/xhtml" xmlns:firstDayOfWeek="http://www.w3.org/1999/xhtml">
+    <div style="padding-left: 30px;">
+    <div *ngIf="non == false && oui == true" class="alert alert-primary d-flex align-items-center" role="alert" style="width: 98%;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+      </svg>
+      Cet agent : " {{selectedAgent.nom}} {{selectedAgent.prenom}} " n'est pas disponible dans la calendrier car il n'a pas une visite.
+    </div>
+    </div>
+    <div style="padding-left: 30px;">
+    <div *ngIf="non == true && oui == false" class="alert alert-primary d-flex align-items-center" role="alert" style="width: 98%;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+      </svg>
+      Cet agent : " {{selectedAgent.nom}} {{selectedAgent.prenom}} " n'est pas disponible dans la calendrier car il a accomplie sa visite.
+    </div>
+    </div>
+    <br>
+    <div class="row text-center" style="position: relative;left: 10px;">
+      <div class="col-md-4">
+        <div class="btn-group">
+          <div *ngIf="prece == true && aujour == false && suiv == false"
+               class="btn waiteded2"
+               mwlCalendarPreviousView
+               [view]="view"
+               [(viewDate)]="viewDate"
+               [excludeDays]="excludeDays"
+               (viewDateChange)="closeOpenMonthViewDay()"
+               (click)="Prece()"
+          >
+            <- Précédent
+          </div>
+          <div *ngIf="prece == false && aujour == true && suiv == false"
+               class="btn waiteded22"
+               mwlCalendarPreviousView
+               [view]="view"
+               [(viewDate)]="viewDate"
+               [excludeDays]="excludeDays"
+               (viewDateChange)="closeOpenMonthViewDay()"
+               (click)="Prece()"
+          >
+            <- Précédent
+          </div>
+          <div *ngIf="prece == false && aujour == false && suiv == true"
+               class="btn waiteded22"
+               mwlCalendarPreviousView
+               [view]="view"
+               [(viewDate)]="viewDate"
+               [excludeDays]="excludeDays"
+               (viewDateChange)="closeOpenMonthViewDay()"
+               (click)="Prece()"
+          >
+            <- Précédent
+          </div>
+          <div *ngIf="prece == false && aujour == true && suiv == false"
+               class="btn waiteded2"
+               mwlCalendarToday
+               [(viewDate)]="viewDate"
+               (click)="Aujour()"
+          >
+            Aujourd'hui
+          </div>
+          <div *ngIf="prece == true && aujour == false && suiv == false"
+               class="btn waiteded22"
+               mwlCalendarToday
+               [(viewDate)]="viewDate"
+               (click)="Aujour()"
+          >
+            Aujourd'hui
+          </div>
+          <div *ngIf="prece == false && aujour == false && suiv == true"
+               class="btn waiteded22"
+               mwlCalendarToday
+               [(viewDate)]="viewDate"
+               (click)="Aujour()"
+          >
+            Aujourd'hui
+          </div>
+          <div *ngIf="prece == false && aujour == false && suiv == true"
+               class="btn waiteded2"
+               mwlCalendarNextView
+               [view]="view"
+               [(viewDate)]="viewDate"
+               [excludeDays]="excludeDays"
+               (viewDateChange)="closeOpenMonthViewDay()"
+               (click)="Suiv()"
+          >
+            Suivant ->
+          </div>
+          <div *ngIf="prece == false && aujour == true && suiv == false"
+               class="btn waiteded22"
+               mwlCalendarNextView
+               [view]="view"
+               [(viewDate)]="viewDate"
+               [excludeDays]="excludeDays"
+               (viewDateChange)="closeOpenMonthViewDay()"
+               (click)="Suiv()"
+          >
+            Suivant ->
+          </div>
+          <div *ngIf="prece == true && aujour == false && suiv == false"
+               class="btn waiteded22"
+               mwlCalendarNextView
+               [view]="view"
+               [(viewDate)]="viewDate"
+               [excludeDays]="excludeDays"
+               (viewDateChange)="closeOpenMonthViewDay()"
+               (click)="Suiv()"
+          >
+            Suivant ->
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale:weekStartsOn:excludeDays }}</h3>
+      </div>
+      <div class="col-md-4">
+        <span style="padding-left: 120px;"></span>
+        <div class="btn-group">
+          <div *ngIf="mois == true && semaine == false"
+               class="btn waiteded2"
+               (click)="setView(CalendarView.Month)"
+               (click)="Mois()"
+               [class.active]="view === CalendarView.Month"
+          >
+            Mois
+          </div>
+          <div *ngIf="mois == false && semaine == true"
+               class="btn waiteded"
+               (click)="setView(CalendarView.Month)"
+               (click)="Mois()"
+               [class.active]="view === CalendarView.Month"
+          >
+            Mois
+          </div>
+          <div *ngIf="mois == true && semaine == false"
+               class="btn waiteded"
+               (click)="setView(CalendarView.Week)"
+               (click)="Semaine()"
+               [class.active]="view === CalendarView.Week"
+          >
+            Semaine
+          </div>
+          <div *ngIf="mois == false && semaine == true"
+               class="btn waiteded2"
+               (click)="setView(CalendarView.Week)"
+               (click)="Semaine()"
+               [class.active]="view === CalendarView.Week"
+          >
+            Semaine
+          </div>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div [ngSwitch]="view">
+      <mwl-calendar-month-view
+        data-bs-toggle="modal" data-bs-target="#exampleModalPop1"
+        *ngSwitchCase="CalendarView.Month"
+        [viewDate]="viewDate"
+        [events]="events"
+        [refresh]="refresh"
+        [locale]="locale"
+        [excludeDays]="excludeDays"
+        (eventTimesChanged)="eventTimesChanged($any($event))"
+        (eventClicked)="handleEvent('Clicked', $event.event)"
+        (dayClicked)="dayClickedEventAndNextEvent($event.day)"
+      >
+      </mwl-calendar-month-view>
+      <!-- Modal -->
+      <div class="modal fade"  data-bs-keyboard="false" data-bs-backdrop="static" id="exampleModalPop1"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2 class="modal-title" id="exampleModalLabelPop1">Chargement des visites</h2>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="cancelClick()"></button>
+            </div>
+
+            <div class="modal-body">
+
+              <div style="padding-left: 170px;">
+                <mat-button-toggle-group  #group="matButtonToggleGroup" aria-label="Font Style">
+                  <mat-button-toggle *ngIf="(clickEvented.length != 0 && clickNextEvented.length == 0 && clickNextEvented2.length == 0) ||
+                                 (clickEvented.length != 0 && clickNextEvented.length != 0 && clickNextEvented2.length == 0) ||
+                                 (clickEvented.length != 0 && clickNextEvented.length == 0 && clickNextEvented2.length != 0) ||
+                                 (clickEvented.length != 0 && clickNextEvented.length != 0 && clickNextEvented2.length != 0)" class="blue"
+                                     checked value="Non Replanifier" (click)="cancelClickForReplanfier()">Visite planifiée</mat-button-toggle>
+                  <mat-button-toggle *ngIf="clickEvented.length==0"
+                                     value="Non Replanifier" disabled >Visite planifiée</mat-button-toggle>
+
+                  <mat-button-toggle *ngIf="(clickEvented.length == 0 && clickNextEvented.length != 0 && clickNextEvented2.length == 0) ||
+            (clickEvented.length == 0 && clickNextEvented.length != 0 && clickNextEvented2.length != 0)" class="yellow"
+                                     checked value="Replanifier" (click)="cancelClickForNonReplanifier()">Visite replanifiée</mat-button-toggle>
+
+                  <mat-button-toggle *ngIf="clickNextEvented.length==0" disabled>Visite replanifiée</mat-button-toggle>
+                  <mat-button-toggle *ngIf="(clickEvented.length != 0 && clickNextEvented != 0 && clickNextEvented2 != 0)
+               || (clickEvented.length != 0 && clickNextEvented != 0 && clickNextEvented2 == 0)" class="yellow"
+                                     value="Replanifier" (click)="cancelClickForNonReplanifier()">Visite replanifiée</mat-button-toggle>
+
+                  <mat-button-toggle *ngIf="(clickEvented.length == 0 && clickNextEvented.length == 0 && clickNextEvented2.length != 0)"
+                                     class="red" checked value="ZoneRouge"
+                                     (click)="cancelClickForZoneRouge()">Visite dans la zone rouge</mat-button-toggle>
+                  <mat-button-toggle *ngIf="(clickEvented.length != 0 && clickNextEvented2 != 0) || (clickNextEvented.length != 0 && clickNextEvented2 != 0)"
+                                     value="ZoneRouge" class="red"
+                                     (click)="cancelClickForZoneRouge()">Visite dans la zone rouge</mat-button-toggle>
+                  <mat-button-toggle *ngIf="clickNextEvented2.length==0" value="ZoneRouge" disabled>Visite dans la zone rouge</mat-button-toggle>
+
+                </mat-button-toggle-group>
+              </div>
+              <br>
+
+              <div *ngIf="group.value=='Non Replanifier'">
+                <h3>Visite planifiée :</h3>
+                <cdk-virtual-scroll-viewport itemSize="40" style="height: 200px;">
+                  <table mat-table [dataSource]="datasourceClickEvent" class="mat-elevation-z8" style="width: 100%;" multiTemplateDataRows>
+
+
+                    <ng-container matColumnDef="matsrtb">
+                      <th mat-header-cell *matHeaderCellDef>MATR S.R.T.B</th>
+                      <td mat-cell *matCellDef="let element"> {{element.matsrtb}} </td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="direction">
+                      <th mat-header-cell *matHeaderCellDef> DIRECTION</th>
+                      <td mat-cell *matCellDef="let element"> {{element.direction}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="fonction">
+                      <th mat-header-cell *matHeaderCellDef>FONCTION</th>
+                      <td mat-cell *matCellDef="let element"> {{element.fonction}} </td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="nom">
+                      <th mat-header-cell *matHeaderCellDef>NOM</th>
+                      <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="prenom">
+                      <th mat-header-cell *matHeaderCellDef>PRENOM</th>
+                      <td mat-cell *matCellDef="let element"> {{element.prenom}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="event">
+                      <th mat-header-cell *matHeaderCellDef>DATE DE LA VISITE PLANIFIÉE</th>
+                      <td mat-cell *matCellDef="let element"> {{element.visite.event}} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsEvent"></tr>
+                    <tr mat-row *matRowDef="let row1; columns: displayedColumnsEvent;" class="cursor"
+                        [ngClass]="{'highlight2': highlightEvent()==row1.matsrtb}"
+                        (click)="OnRowClickedEvent(row1,updateForm)"></tr>
+                  </table>
+                </cdk-virtual-scroll-viewport>
+              </div>
+              <br>
+              <div *ngIf="group.value=='Replanifier'">
+                <h3>Visite replanifiée : </h3>
+                <cdk-virtual-scroll-viewport itemSize="40" style="height: 200px;">
+                  <table mat-table [dataSource]="datasourceClickNextEvent" class="mat-elevation-z8" style="width: 100%;" multiTemplateDataRows>
+
+
+                    <ng-container matColumnDef="matsrtb">
+                      <th mat-header-cell *matHeaderCellDef>MATR S.R.T.B</th>
+                      <td mat-cell *matCellDef="let element"> {{element.matsrtb}} </td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="direction">
+                      <th mat-header-cell *matHeaderCellDef> DIRECTION</th>
+                      <td mat-cell *matCellDef="let element"> {{element.direction}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="fonction">
+                      <th mat-header-cell *matHeaderCellDef>FONCTION</th>
+                      <td mat-cell *matCellDef="let element"> {{element.fonction}} </td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="nom">
+                      <th mat-header-cell *matHeaderCellDef>NOM</th>
+                      <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="prenom">
+                      <th mat-header-cell *matHeaderCellDef>PRENOM</th>
+                      <td mat-cell *matCellDef="let element"> {{element.prenom}} </td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="Nextevent">
+                      <th mat-header-cell *matHeaderCellDef>DATE DE LA VISITE REPLANIFIÉE</th>
+                      <td mat-cell *matCellDef="let element"> {{element.visite.nextEvent}} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsNextEvent"></tr>
+                    <tr mat-row *matRowDef="let row1; columns: displayedColumnsNextEvent;" class="cursor"
+                        [ngClass]="{'highlight1': highlightNextEvent()==row1.matsrtb}"
+                        (click)="OnRowClickedNextEvent(row1,updateForm)"></tr>
+                  </table>
+                </cdk-virtual-scroll-viewport>
+              </div>
+              <br>
+              <br>
+              <div *ngIf="group.value=='ZoneRouge'">
+                <h3>Visite dans la zone rouge : </h3>
+                <cdk-virtual-scroll-viewport itemSize="40" style="height: 200px;">
+                  <table mat-table [dataSource]="datasourceNext2" class="mat-elevation-z8" style="width: 100%;" multiTemplateDataRows>
+
+
+                    <ng-container matColumnDef="matsrtb">
+                      <th mat-header-cell *matHeaderCellDef>MATR S.R.T.B</th>
+                      <td mat-cell *matCellDef="let element"> {{element.matsrtb}} </td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="direction">
+                      <th mat-header-cell *matHeaderCellDef> DIRECTION</th>
+                      <td mat-cell *matCellDef="let element"> {{element.direction}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="fonction">
+                      <th mat-header-cell *matHeaderCellDef>FONCTION</th>
+                      <td mat-cell *matCellDef="let element"> {{element.fonction}} </td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="nom">
+                      <th mat-header-cell *matHeaderCellDef>NOM</th>
+                      <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="prenom">
+                      <th mat-header-cell *matHeaderCellDef>PRENOM</th>
+                      <td mat-cell *matCellDef="let element"> {{element.prenom}} </td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="Nextevent">
+                      <th mat-header-cell *matHeaderCellDef>DATE DE LA VISITE REPLANIFIÉE</th>
+                      <td mat-cell *matCellDef="let element"> {{element.visite.nextEvent}} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsNextEvent2"></tr>
+                    <tr mat-row *matRowDef="let row1; columns: displayedColumnsNextEvent2;" class="cursor"
+                        [ngClass]="{'highlight3': highlightNextEvent()==row1.matsrtb}"
+                        (click)="OnRowClickedNextEvent(row1,updateForm)"></tr>
+                  </table>
+                </cdk-virtual-scroll-viewport>
+              </div>
+              <br>
+              <form #updateForm="ngForm">
+                <div *ngIf="selectEvent && !selectNextEvent && group.value=='Non Replanifier'">
+                  <div style="padding-left: 220px;">
+                    <mat-button-toggle-group  #UpDele="matButtonToggleGroup" aria-label="Font Style">
+                      <mat-button-toggle value="Modifier Evenement" class="blue" (click)="clickForUpdate()">Replanifier la visite</mat-button-toggle>
+                      <mat-button-toggle value="Supprimer Evenement" class="blue" (click)="CompareDatesSupp()">Supprimer la visite</mat-button-toggle>
+                    </mat-button-toggle-group>
+                  </div>
+                  <br>
+                  <div *ngIf="UpDele.value=='Modifier Evenement'">
+                    <br>
+                    <label>Est-ce qu'(il/elle) accomplit sa visite ?</label> <br><br>
+                    <mat-radio-group ngModel="{{selectEvent.visite.visited}}" name="visited" #isVisited="ngModel" required
+                                     aria-label="Select an option">
+                      <mat-radio-button  value="true" color="primary" [disabled]="CompareDatesForVisite()==true">Oui</mat-radio-button><span style="padding-left: 2em"></span>
+                      <mat-radio-button value="false" color="primary" [disabled]="selectEvent.visite.visited==true">Non</mat-radio-button>
+                    </mat-radio-group>
+                    <div *ngIf="isVisited.errors && (isVisited.invalid && isVisited.touched)">
+                      <small class="text-danger" *ngIf="isVisited.errors?.['required']" >Ce champ est obligatoire!</small>
+                    </div>
+                    <br>
+                    <div *ngIf="isVisited.value == 'false' && CompareDatesForVisite()==false">
+                      <br>
+                      <label>Date de nouvelle visite :<span class="text-danger">*</span></label> <br>
+                      <mat-form-field>
+                        <input matInput [matDatepickerFilter]="myFilter" [min]="ddEventForSelect && dates"
+                               [max]="ddEvent"
+                               (ngModelChange)=" ExistUpdateEvent(nextEvent.value)"
+                               (ngModelChange)="ExistUpdateNextEvent(nextEvent.value)"
+                               (ngModelChange)="CompareDates(nextEvent.value)"
+                               (ngModelChange)="calculBetweenDayse(nextEvent.value)"
+                               (ngModelChange)="ExistForm(nextEvent.value)"
+                               [matDatepicker]="$any(myDateEvent)" ngModel #nextEvent="ngModel" name="nextEvent" placeholder="YYYY-MM-DD" readonly>
+                        <mat-datepicker-toggle matSuffix [for]="myDateEvent"></mat-datepicker-toggle>
+                        <mat-datepicker #myDateEvent (opened)="streamOpened($event)"
+                                        [dateClass]="dateClass" panelClass="endDate"></mat-datepicker>
+                      </mat-form-field>
+                      <div *ngIf="!selectNextEvent && selectEvent && nextEvent.value">
+                        <small class="text-danger" *ngIf="((exiUpdateEve==true || exiUpdateNextEve==true) && (compareDate==true))">
+                          Il existe des agents qui ont déjà la même (agence,fonction('chaufeur')).</small><br>
+                        <small class="text-danger" *ngIf="(compareDate==false)"><br>
+                          La visite actuelle est déjà sa visite.</small>
+                        <small class="text-danger">{{stre}}</small>
+                      </div>
+                      <hr>
+                      <div *ngIf="isVisited.value == 'false'">
+                        <h3>Voulez-vous vraiment replanifier cette visite ? <button *ngIf="group.value=='Non Replanifier'" type="button" class="btn green" data-bs-dismiss="modal" [disabled]="bolli==true || leted==false || !selectEvent || leted==null || !nextEvent.value || ((exiUpdateEve==true || exiUpdateNextEve==true) && (compareDate==true)) || (compareDate==false) || isVisited.value == 'false' && CompareDatesForVisite()==true && selectEvent.visite.visited == false " (click)="updatNextEventNonReplanfifier(updateForm)">Oui</button><span style="padding-left: 12px;"></span>    <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick()">Non</button></h3>
+                      </div>
+                    </div>
+                    <hr *ngIf="isVisited.value == 'true'">
+                    <div *ngIf="isVisited.value == 'true'">
+                      <h3>Voulez-vous vraiment accomplir cette visite ? <button *ngIf="group.value=='Non Replanifier'" type="button" class="btn green" data-bs-dismiss="modal" (click)="updatNextEventNonReplanfifier(updateForm)">Oui</button><span style="padding-left: 12px;"></span>    <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick()">Non</button></h3>
+                    </div>
+                  </div>
+                  <br>
+                  <div *ngIf="UpDele.value == 'Supprimer Evenement'">
+                    <div class="alert alert-primary" role="alert">
+                      Une visite ne peut pas être supprimée si vous dépassez sa date — Attention !
+                    </div>
+                    <hr>
+                    <div>
+                      <h3>Voulez-vous vraiment supprimer cette visite ? <button *ngIf="group.value=='Non Replanifier'" [disabled]="bolli==false || leted==true || !selectEvent || leted==null" type="button" class="btn green" data-bs-dismiss="modal" (click)="UpdateForDelete2()">Oui</button><span style="padding-left: 12px;"></span>    <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick()">Non</button></h3>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="(selectNextEvent && !selectEvent && group.value=='Replanifier') || (selectNextEvent && !selectEvent && group.value=='ZoneRouge')">
+                  <div style="padding-left: 220px;">
+                    <mat-button-toggle-group  #UpDele="matButtonToggleGroup" aria-label="Font Style">
+                      <mat-button-toggle *ngIf="group.value=='Replanifier'" class="yellow" value="Modifier Evenement" (click)="clickForUpdate()">Replanifier la visite</mat-button-toggle>
+                      <mat-button-toggle *ngIf="group.value=='Replanifier'" class="yellow" value="Supprimer Evenement" (click)="CompareDatesSupp()">Supprimer la visite</mat-button-toggle>
+                      <mat-button-toggle *ngIf="group.value=='ZoneRouge'" class="red" value="Modifier Evenement" (click)="clickForUpdate()">Replanifier la visite</mat-button-toggle>
+                      <mat-button-toggle *ngIf="group.value=='ZoneRouge'" class="red" value="Supprimer Evenement" (click)="CompareDatesSupp()">Supprimer la visite</mat-button-toggle>
+                    </mat-button-toggle-group>
+                  </div>
+                  <br>
+                  <div *ngIf="UpDele.value=='Modifier Evenement'">
+                    <br>
+                    <label>Est-ce qu'(il/elle) accomplit sa visite ?</label> <br><br>
+                    <mat-radio-group ngModel="{{selectNextEvent.visite.visited}}" name="visited" #isVisited="ngModel" required
+                                     aria-label="Select an option">
+                      <mat-radio-button  value="true" color="primary" [disabled]="CompareDatesForVisite()==true">Oui</mat-radio-button><span style="padding-left: 2em"></span>
+                      <mat-radio-button value="false" color="primary" [disabled]="selectNextEvent.visite.visited == true">Non</mat-radio-button>
+                    </mat-radio-group>
+                    <div *ngIf="isVisited.errors && (isVisited.invalid && isVisited.touched)">
+                      <small class="text-danger" *ngIf="isVisited.errors?.['required']" >Ce champ est obligatoire!</small>
+                    </div>
+
+                    <br>
+                    <div *ngIf="isVisited.value == 'false' && CompareDatesForVisite()==false">
+                      <br>
+                      <label>Date de nouvelle visite :<span class="text-danger">*</span></label> <br>
+                      <mat-form-field>
+                        <input matInput [matDatepickerFilter]="myFilter" [min]="ddEventForSelectNext && dates"
+                               [max]="ddNext"
+                               (ngModelChange)=" ExistUpdateEventForNext(nextEvent.value)"
+                               (ngModelChange)="ExistUpdateNextEventForNext(nextEvent.value)"
+                               (ngModelChange)="CompareDatesForNext(nextEvent.value)"
+                               (ngModelChange)="calculBetweenDays(nextEvent.value)"
+                               (ngModelChange)="ExistForm(nextEvent.value)"
+                               [matDatepicker]="$any(myDate)" ngModel #nextEvent="ngModel" name="nextEvent" placeholder="YYYY-MM-DD" readonly>
+                        <mat-datepicker-toggle matSuffix [for]="myDate"></mat-datepicker-toggle>
+                        <mat-datepicker #myDate (opened)="streamOpened($event)" [dateClass]="dateClass"
+                                        panelClass="endDate"></mat-datepicker>
+                      </mat-form-field>
+                      <div *ngIf="selectNextEvent && !selectEvent && nextEvent.value">
+                        <small class="text-danger" *ngIf="((exiUpdateEveForNext==true || exiUpdateNextEveForNext==true) && (compareDateForNext==true))">
+                          Il existe des agents qui ont déjà la même (agence,fonction('chaufeur')).</small><br>
+                        <small class="text-danger" *ngIf="(compareDateForNext==false)">
+                          La visite actuelle est déjà sa visite.</small><br>
+                        <small class="text-danger">{{str}}</small>
+                      </div>
+                      <hr >
+                      <div *ngIf="isVisited.value == 'false'">
+                        <h3>Voulez-vous vraiment replanifier cette visite ? <button *ngIf="(group.value=='Replanifier') || (group.value=='ZoneRouge')" type="button" class="btn green" data-bs-dismiss="modal" [disabled]="bolli==true || leted==false || !selectNextEvent || leted==null || !nextEvent.value || ((exiUpdateEveForNext==true || exiUpdateNextEveForNext==true) && (compareDateForNext==true)) || (compareDateForNext==false) || isVisited.value == 'false' && CompareDatesForVisite()==true && selectNextEvent.visite.visited == false "  (click)="updatNextEventReplanfifier(updateForm)">Oui</button> <span style="padding-left: 12px;"></span>   <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick()">Non</button> </h3>
+                      </div>
+                    </div>
+                    <hr *ngIf="isVisited.value == 'true'">
+                    <div *ngIf="isVisited.value == 'true'">
+                      <h3>Voulez-vous vraiment accomplir cette visite ? <button *ngIf="(group.value=='Replanifier') || (group.value=='ZoneRouge')" type="button" class="btn green" data-bs-dismiss="modal" (click)="updatNextEventReplanfifier(updateForm)">Oui</button> <span style="padding-left: 12px;"></span>   <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick()">Non</button> </h3>
+                    </div>
+                  </div>
+                  <br>
+                  <div *ngIf="UpDele.value == 'Supprimer Evenement'">
+                    <div class="alert alert-primary" role="alert">
+                      Une visite ne peut pas être supprimée si vous dépassez sa date — Attention !
+                    </div>
+                    <hr>
+                    <div>
+                      <h3> Voulez-vous vraiment supprimer cette visite ? <button *ngIf="(group.value=='Replanifier') || (group.value=='ZoneRouge')" [disabled]="bolli==false || leted==true || !selectNextEvent || leted==null" type="button" class="btn green" data-bs-dismiss="modal" (click)="UpdateForDelete()">Oui</button> <span style="padding-left: 12px;"></span>   <button type="button" class="btn stopee" data-bs-dismiss="modal" (click)="cancelClick()">Non</button></h3>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn stop " data-bs-dismiss="modal" (click)="cancelClick()">Annuler</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <mwl-calendar-week-view
+        data-bs-toggle="modal" data-bs-target="#exampleModalPop1"
+        *ngSwitchCase="CalendarView.Week"
+        [viewDate]="viewDate"
+        [events]="events"
+        [refresh]="refresh"
+        [locale]="locale"
+        [excludeDays]="excludeDays"
+        (eventTimesChanged)="eventTimesChanged($any($event))"
+        (dayHeaderClicked)="dayClickedEventAndNextEvent($any($event.day))"
+        (eventClicked)="handleEvent('Clicked', $event.event)"
+        [hourSegments]="0"
+      >
+      </mwl-calendar-week-view>
+      <mwl-calendar-day-view
+        *ngSwitchCase="CalendarView.Day"
+        [viewDate]="viewDate"
+        [events]="events"
+        [refresh]="refresh"
+        [locale]="locale"
+        (eventClicked)="handleEvent('Clicked', $event.event)"
+        (eventTimesChanged)="eventTimesChanged($event)"
+      >
+      </mwl-calendar-day-view>
+    </div>
+
+    <br /><br /><br />
+
+    <div style="padding-right: 10px;">
+      <button class="btn sssse float-end" [disabled]="selectedAgent" (click)="getAllAgentByPriority()" data-bs-toggle="modal" data-bs-target="#exampleModalPopSele1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+        </svg>
+        Planifier une nouvelle visite
+      </button>
+      <div class="clearfix"></div>
+    </div>
+    <br>
+
+
+    <!-- Modal -->
+    <div class="modal fade" data-bs-keyboard="false" data-bs-backdrop="static" id="exampleModalPopSele1"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabelPopSele1">Chargement des agents</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="cancelClick()"></button>
+          </div>
+
+          <div class="modal-body">
+            <div>
+              <h3>Les agents par priorité des dates : </h3>
+            </div>
+
+            <cdk-virtual-scroll-viewport itemSize="40" style="height: 200px;">
+              <table mat-table [dataSource]="datasource"  class="mat-elevation-z8" style="width: 100%;" multiTemplateDataRows>
+
+
+                <ng-container matColumnDef="matsrtb">
+                  <th mat-header-cell *matHeaderCellDef>MATR S.R.T.B</th>
+                  <td mat-cell *matCellDef="let element"> {{element.matsrtb}} </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="direction">
+                  <th mat-header-cell *matHeaderCellDef> DIRECTION</th>
+                  <td mat-cell *matCellDef="let element"> {{element.direction}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="fonction">
+                  <th mat-header-cell *matHeaderCellDef>FONCTION</th>
+                  <td mat-cell *matCellDef="let element"> {{element.fonction}} </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="nom">
+                  <th mat-header-cell *matHeaderCellDef>NOM</th>
+                  <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="prenom">
+                  <th mat-header-cell *matHeaderCellDef>PRENOM</th>
+                  <td mat-cell *matCellDef="let element"> {{element.prenom}} </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="visite">
+                  <th mat-header-cell *matHeaderCellDef>INDI DATE AVANT PROCHAINE VISITE</th>
+                  <td mat-cell *matCellDef="let element"> {{element.visite.nextdate}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="visitePro">
+                  <th mat-header-cell *matHeaderCellDef>INDI DATE DE LA PROCHAINE VISITE</th>
+                  <td mat-cell *matCellDef="let element"> {{element.visite.lastdate}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor"
+                    [ngClass]="{'highlight': highlight()==row.matsrtb}"
+                    (click)="OnRowClicked(row,addForm)"></tr>
+
+              </table>
+            </cdk-virtual-scroll-viewport>
+            <br>
+            <form #addForm="ngForm">
+              <h4 class="mb-5 fs-4 text-secondary" *ngIf="selectedRow">Planifier une visite pour les agents :</h4>
+              <br>
+              <div class="mb-3 col-md-3" *ngIf="selectedRow">
+                <label>Date de l'événement :<span class="text-danger">*</span></label>
+
+                <mat-form-field>
+                  <input matInput [matDatepickerFilter]="myFilter" [min]="selectedRow.visite.nextdate && dates"
+                         [max]="dd"
+                         [matDatepicker]="$any(myDatePicker)" ngModel #event="ngModel" name="event"
+                         (ngModelChange)=" ExistNextEvent(event.value)"
+                         (ngModelChange)="ExistEvent(event.value)" placeholder="YYYY-MM-DD" readonly>
+                  <mat-datepicker-toggle matSuffix [for]="myDatePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #myDatePicker (opened)="streamOpened($event)" [dateClass]="dateClass"
+                                  panelClass="endDate"></mat-datepicker>
+                </mat-form-field>
+                <div *ngIf="selectedRow && event.value">
+                  <small class="text-danger" *ngIf="((exiEve==true || exiNextEve==true))">
+                    Il existe des agents qui ont déjà la même (agence,fonction('chaufeur')).</small>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn stopee" data-bs-dismiss="modal">Non</button>
+            <button type="button" class="btn green" data-bs-dismiss="modal" [disabled]="exiEve==true || exiNextEve==true || !selectedRow" (click)="addEvent(addForm)">Oui</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+</div>
+
+
+<br><br>
+
+

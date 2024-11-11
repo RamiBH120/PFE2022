@@ -1,0 +1,76 @@
+<div class="m-auto">
+  <br>
+  <div class="wrapper">
+    <div class="logo">
+      <img src="assets/profile_08blue.png" alt=""> </div>
+    <ng-container *ngIf="isValidToken">
+    <div class="text-center mt-4 name"> Modifier votre mot de passe</div>
+    <form #resetForm="ngForm" (ngSubmit)="resetPass(password)" class="p-3 form-group m-auto">
+
+      <div class="alert alert-info text-center">Ce lien va expirer aprés {{minutesToDday}}:{{secondsToDday}} minutes, vous devez changer votre mot de passe avant que le temps est fini!.</div>
+
+      <div class="mb-3 m-auto" style="width: 500px">
+          <label>Nouveau mot de passe <span class="text-danger">*</span></label>
+          <div class="input-group mb-3">
+            <input [type]="fieldTextType ? 'text' : 'password'" required class="form-control" (keyup)="checkPass(password,passwordB)" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,20}$"
+                   placeholder="Votre nouveau mot de passe" [(ngModel)]="password1" (change)="password1=password.value"
+                   #password="ngModel" name="password" id="passwordA" autocomplete="off"/>
+            <div class="input-group-append">
+      <span class="input-group-text">
+        <i class="fa" [ngClass]="{'fa-eye-slash': !fieldTextType,'fa-eye': fieldTextType}" (click)="toggleFieldTextType()"></i>
+      </span></div>
+          </div>
+          <div *ngIf="password.errors && password.invalid">
+            <div class="alert alert-danger text-center" *ngIf="password.errors?.['required']" >Mot de passe est obligatoire!!</div>
+            <div class="alert alert-danger text-center" *ngIf="password.errors?.['pattern']" >Mot de passe non valide</div>
+          </div>
+
+        </div>
+
+        <div class="mb-3 m-auto" style="width: 500px">
+          <label>Confirmer le mot de passe <span class="text-danger">*</span></label>
+          <div class="input-group mb-3">
+            <input [type]="fieldTextType2 ? 'text' : 'password'" class="form-control" (keyup)="checkPass(password,passwordB)" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,20}$"
+                   placeholder="Confirmer votre mot de passe" [(ngModel)]="password2" #passwordB="ngModel" name="passwordB" required
+                   id="passwordB" [disabled]="!password.dirty" autocomplete="off"/>
+            <div class="input-group-append">
+      <span class="input-group-text">
+        <i class="fa" [ngClass]="{'fa-eye-slash': !fieldTextType2,'fa-eye': fieldTextType2}" (click)="toggleFieldTextType2()"></i>
+      </span></div>
+          </div>
+
+
+
+      <div *ngIf="passwordB.invalid && (password.dirty || passwordB.touched)" class="alert alert-danger text-center">
+        Prière de confirmer le mot de passe.
+      </div>
+      <div *ngIf="!checkPass(password,passwordB) && (passwordB.dirty || passwordB.touched)"
+           class="alert alert-danger text-center">
+        Pas de correspondance entre les mots de passe.
+      </div>
+  </div>
+  <div class="row">
+    <button type="submit" class="btn float-end hhh m-auto" [disabled]="resetForm.form.invalid" style="width: 300px">Changer le mot de passe
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-key" viewBox="0 0 16 16">
+        <path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10h-.535A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 2.712 4.285A.5.5 0 0 1 7.163 9h.63l.853-.854a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.793-.793-1-1h-6.63a.5.5 0 0 1-.451-.285A3 3 0 0 0 4 5z"/>
+        <path d="M4 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+      </svg></button>
+  </div>
+
+    </form>
+    </ng-container>
+    <ng-container *ngIf="!isValidToken">
+      <div class="text-center mt-4 name">Cette page est inaccessible pour les raisons suivants : </div>
+      <br><br>
+      <ul class="sub_name">
+        <li>Il se peut que le lien de récupération de votre mot de passe est invalide.</li><br>
+        <li>Il se peut que le lien de récupération de votre mot de passe a expiré.</li><br>
+        <li>Il se peut que le lien de récupération de votre mot de passe a été déjà utilisé donc il n'existe plus.</li><br>
+        <li>Il se peut que vous n'avez pas envoyé une requête de récupération de votre mot de passe.</li>
+      </ul>
+    </ng-container>
+</div>
+  <div class="py-4 px-4 px-xl-6 text-white sub_div">
+    Année Universitaire 2021/2022.
+  </div>
+</div>

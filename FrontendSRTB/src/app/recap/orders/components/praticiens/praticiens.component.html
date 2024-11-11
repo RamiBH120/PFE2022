@@ -1,0 +1,392 @@
+<div class="container-fluid" >
+  <div class="row border border-3 rounded-bottom shadow-sm bg-body rounded">
+    <div>
+      <h4 class="p-3 fs-4 text-secondary text-center">Gestion des praticiens</h4>
+    </div>
+  </div>
+</div>
+
+<br>
+<br>
+
+<div class="row justify-content-between">
+  <div class="col-2" style="padding-left: 2em;">
+    <button class="btn impr" style="width: 150px;" (click)="pdfGenerate()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+        <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+        <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+      </svg>
+      Imprimer</button>
+  </div>
+  <div class="col-3">
+    <mat-form-field class="example-full-width"style="width: 90% ;">
+      <input matInput placeholder="Chercher un praticien" autocomplete="off" #name (keyup)="findPraticienByName(name)">
+    </mat-form-field>
+  </div>
+</div>
+<br>
+
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z8" style="width: 100%;">
+
+
+  <ng-container matColumnDef="matriculePraticien">
+    <th mat-header-cell *matHeaderCellDef> MATRICULE DU PRATICIEN </th>
+    <td mat-cell *matCellDef="let element"> {{element.matriculePraticien}} </td>
+  </ng-container>
+  <!-- Position Column -->
+  <ng-container matColumnDef="nom">
+    <th mat-header-cell *matHeaderCellDef> NOM DU PRATICIEN </th>
+    <td mat-cell *matCellDef="let element"> {{element.nom | titlecase}} </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="prenom">
+    <th mat-header-cell *matHeaderCellDef> PRENOM DU PRATICIEN </th>
+    <td mat-cell *matCellDef="let element"> {{element.prenom | titlecase}} </td>
+  </ng-container>
+
+  <!-- Weight Column -->
+  <ng-container matColumnDef="matriculeFiscale">
+    <th mat-header-cell *matHeaderCellDef> MATRICULE FISCALE DU PRATICIEN</th>
+    <td mat-cell *matCellDef="let element"> {{element.matriculeFiscale}} </td>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="phoneNumber">
+    <th mat-header-cell *matHeaderCellDef> NUMERO TÉLÉPHONE DU PRATICIEN </th>
+    <td mat-cell *matCellDef="let element"> {{element.phoneNumber == '(+216) ' ? 'Aucun numéro de téléphone' : element.phoneNumber}} </td>
+  </ng-container>
+
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky:true"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor"
+      [ngClass]="{'highlight' : highlightPhar() == row.id}"
+      (click)="onRowClicked(row)"></tr>
+</table>
+
+
+<!--pagination of table-->
+<mat-paginator [length]="100"
+               [pageSize]="3"
+               [pageSizeOptions]="[1,3, 6 , 9 , 12]">
+</mat-paginator>
+
+
+
+<br>
+<div class="container-fluid" >
+  <div class="row mr-5 ml-5" >
+      <form #addForm="ngForm" action="" class="mt-5 border p-4 bg-light shadow">
+        <h4 class="mb-5 fs-4 text-secondary">Informations sur la gestion des praticiens</h4>
+        <div class="row">
+
+          <div class="col bordright mt-2">
+
+
+
+            <div class="row m-1 border border-3 rounded-3">
+              <div class="mb-3 col-md-6">
+                <label>Nom du praticien <span class="text-danger">*</span></label>
+                <ng-container *ngIf="!selectedRow">
+                  <input type="text" ngModel name="nom" class="form-control" required autocomplete="off"
+                         pattern="^([a-zA-Z]+\s)*[a-zA-Z]{1,50}$"  #nom="ngModel" [class.is-invalid]="nom.invalid && nom.touched">
+                  <div *ngIf="nom.errors && (nom.invalid && nom.touched)">
+                    <small class="text-danger" *ngIf="nom.errors?.['required']" >Ce champ est obligatoire!</small>
+                    <small class="text-danger" *ngIf="nom.errors?.['pattern']" >Ce champ est invalide</small>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="selectedRow">
+                  <input type="text" ngModel="{{ selectedRow.nom }}" name="nom" class="form-control" required
+                         pattern="^([a-zA-Z]+\s)*[a-zA-Z]{1,50}$"  #nom="ngModel" [class.is-invalid]="nom.invalid && nom.touched" autocomplete="off">
+                  <div *ngIf="nom.errors && (nom.invalid && nom.touched)">
+                    <small class="text-danger" *ngIf="nom.errors?.['required']" >Ce champ est obligatoire!</small>
+                    <small class="text-danger" *ngIf="nom.errors?.['pattern']" >Ce champ est invalide</small>
+                  </div>
+                </ng-container>
+              </div>
+
+              <div class="mb-3 col-md-6">
+                <label>Prenom du praticien <span class="text-danger">*</span></label>
+                <ng-container *ngIf="!selectedRow">
+                  <input type="text" ngModel name="prenom" class="form-control" required autocomplete="off"
+                         pattern="^([a-zA-Z]+\s)*[a-zA-Z]{1,50}$"  #prenom="ngModel" [class.is-invalid]="prenom.invalid && prenom.touched">
+                  <div *ngIf="prenom.errors && (prenom.invalid && prenom.touched)">
+                    <small class="text-danger" *ngIf="prenom.errors?.['required']" >Ce champ est obligatoire!</small>
+                    <small class="text-danger" *ngIf="prenom.errors?.['pattern']" >Ce champ est invalide</small>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="selectedRow">
+                  <input type="text" ngModel="{{ selectedRow.prenom }}" name="prenom" class="form-control"
+                         required autocomplete="off"
+                         pattern="^([a-zA-Z]+\s)*[a-zA-Z]{1,50}$"  #prenom="ngModel" [class.is-invalid]="prenom.invalid && prenom.touched">
+                  <div *ngIf="prenom.errors && (prenom.invalid && prenom.touched)">
+                    <small class="text-danger" *ngIf="prenom.errors?.['required']" >Ce champ est obligatoire!</small>
+                    <small class="text-danger" *ngIf="prenom.errors?.['pattern']" >Ce champ est invalide</small>
+                  </div>
+                </ng-container>
+              </div></div>
+
+
+          <div class="row m-1 border border-3 rounded-3">
+          <div class="mb-3 col-md-6">
+            <label>Matricule du praticien <span class="text-danger">*</span></label>
+            <ng-container *ngIf="!selectedRow">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend"><span class="input-group-text" id="url-base">PRA</span></div>
+              <input type="text" ngModel name="matriculePraticien" id="url" aria-describedby="url-base"
+                     (keyup)="getPraByMat(matriculePraticien.value)" autocomplete="off"
+                     (focus)="getPraByMat(matriculePraticien.value)"
+                     (change)="getPraByMat(matriculePraticien.value)"
+                     class="form-control"  required
+                     pattern="^[0-9]{1,20}$"  #matriculePraticien="ngModel"
+                     [class.is-invalid]="matriculePraticien.invalid && matriculePraticien.touched">
+            </div>
+            <small class="text-danger" *ngIf="praVerif == true && matriculePraticien.value && !matriculePraticien.errors && matriculePraticien.touched">{{ existPraMatPra }}</small>
+            <div *ngIf="matriculePraticien.errors && (matriculePraticien.invalid && matriculePraticien.touched)">
+              <small class="text-danger" *ngIf="matriculePraticien.errors?.['required']" >Ce champ est obligatoire!</small>
+              <small class="text-danger" *ngIf="matriculePraticien.errors?.['pattern']" >Ce champ est invalide</small>
+            </div>
+            </ng-container>
+            <ng-container *ngIf="selectedRow">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend"><span class="input-group-text" id="url-base2">PRA</span></div>
+              <input type="text" ngModel="{{ mat }}" id="url2" aria-describedby="rl-base2"
+                     (keyup)="getPraByMat(matriculePraticien.value) || equals(selectedRow.matriculePraticien,matriculePraticien.value)"
+                     (focus)="getPraByMat(matriculePraticien.value) || equals(selectedRow.matriculePraticien,matriculePraticien.value) || ExistPraByMatActeBS()"
+                     (change)="getPraByMat(matriculePraticien.value) && equals(selectedRow.matriculePraticien,matriculePraticien.value)"
+                     name="matriculePraticien" class="form-control"  required autocomplete="off"
+                     [readOnly]="existActeBS==true"
+                     [disabled]="existActeBS == true"
+                     pattern="^[0-9]{1,20}$"  #matriculePraticien="ngModel"
+                     [class.is-invalid]="matriculePraticien.invalid && matriculePraticien.touched">
+            </div>
+            <small class="text-danger" *ngIf="praVerif == true &&
+           eq == false && matriculePraticien.value && matriculePraticien.touched
+           && !matriculePraticien.errors">{{ existPraMatPra }}</small>
+            <div *ngIf="matriculePraticien.errors && (matriculePraticien.invalid && matriculePraticien.touched)">
+              <small class="text-danger" *ngIf="matriculePraticien.errors?.['required']" >Ce champ est obligatoire!</small>
+              <small class="text-danger" *ngIf="matriculePraticien.errors?.['pattern']" >Ce champ est invalide</small>
+            </div>
+            </ng-container>
+          </div>
+
+          <div class="mb-3 col-md-6">
+            <label>Matricule fiscale <span class="text-danger">*</span><small class="text-danger"> (doit être de longeur 13)</small></label>
+            <ng-container *ngIf="!selectedRow">
+              <input type="text" ngModel name="matriculeFiscale" autocomplete="off"
+                     (keyup)="getPraByMatFis(matriculeFiscale.value)" (focus)="getPraByMatFis(matriculeFiscale.value)"
+                     (change)="getPraByMatFis(matriculeFiscale.value)"
+                     class="form-control" required
+                     pattern="^[0-9A-Za-z]{13}$"  #matriculeFiscale="ngModel"
+                     [class.is-invalid]="matriculeFiscale.invalid && matriculeFiscale.touched">
+              <small class="text-danger" *ngIf="praFisVerif == true && matriculeFiscale.value && !matriculeFiscale.errors && matriculeFiscale.touched">{{ existPraMatFisPra }}</small>
+              <div *ngIf="matriculeFiscale.errors && (matriculeFiscale.invalid && matriculeFiscale.touched)">
+                <small class="text-danger" *ngIf="matriculeFiscale.errors?.['required']" >Ce champ est obligatoire!</small>
+                <small class="text-danger" *ngIf="matriculeFiscale.errors?.['pattern']" >Ce champ est invalide</small>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="selectedRow">
+              <input type="text" ngModel="{{ selectedRow.matriculeFiscale }}" name="matriculeFiscale"
+                     class="form-control" required autocomplete="off"
+                     (keyup)="getPraByMatFis(matriculeFiscale.value) ||
+                     equalsFis(selectedRow.matriculeFiscale , matriculeFiscale.value)" (focus)="getPraByMatFis(matriculeFiscale.value)
+                      || equalsFis(selectedRow.matriculeFiscale , matriculeFiscale.value)"
+                     (change)="getPraByMatFis(matriculeFiscale.value) &&
+                     equalsFis(selectedRow.matriculeFiscale , matriculeFiscale.value)"
+                     pattern="^[0-9a-zA-Z]{13}$"  #matriculeFiscale="ngModel"
+                     [class.is-invalid]="matriculeFiscale.invalid && matriculeFiscale.touched">
+              <small class="text-danger" *ngIf="(praFisVerif == true && matriculeFiscale.touched &&
+            eqFis == false && matriculeFiscale.value && !matriculeFiscale.errors)">{{existPraMatFisPra}}</small>
+              <div *ngIf="matriculeFiscale.errors && (matriculeFiscale.invalid && matriculeFiscale.touched)">
+                <small class="text-danger" *ngIf="matriculeFiscale.errors?.['required']" >Ce champ est obligatoire!</small>
+                <small class="text-danger" *ngIf="matriculeFiscale.errors?.['pattern']" >Ce champ est invalide</small>
+              </div>
+            </ng-container>
+          </div></div>
+          </div>
+
+          <div class="col bordleft mt-2">
+          <div class="row m-1 border border-3 rounded-3">
+          <div class="mb-3 col-md-6">
+            <label>Numéro de téléphone du praticien </label>
+            <ng-container *ngIf="!selectedRow">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend"><span class="input-group-text" id="url-base1">(+216)</span></div>
+              <input type="text" ngModel name="phoneNumber" class="form-control"
+                     pattern="^[1-9][0-9]{7}$"  #phoneNumber="ngModel" autocomplete="off" id="url1" aria-describedby="url-base1"
+                     [class.is-invalid]="phoneNumber.invalid && phoneNumber.touched">
+            </div>
+            <ng-container *ngIf="phoneNumber.errors && (phoneNumber.invalid && phoneNumber.touched)">
+              <small class="text-danger" *ngIf="phoneNumber.errors?.['required']" >Il faut un numéro de téléphone svp</small>
+              <small class="text-danger" *ngIf="phoneNumber.errors?.['pattern']" >Entrer un numéro de téléphone exacte svp</small>
+            </ng-container>
+            </ng-container>
+            <ng-container *ngIf="selectedRow">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend"><span class="input-group-text" id="url-base3">(+216)</span></div>
+              <input type="text" ngModel="{{ phone }}" name="phoneNumber" class="form-control"
+                     autocomplete="off" id="url3" aria-describedby="url-base3"
+                     pattern="^[1-9][0-9]{7}$" #phoneNumber="ngModel"
+                     [class.is-invalid]="phoneNumber.invalid && phoneNumber.touched">
+            </div>
+            <ng-container *ngIf="phoneNumber.errors && (phoneNumber.invalid && phoneNumber.touched)">
+              <small class="text-danger" *ngIf="phoneNumber.errors?.['required']" >Ce champ est obligatoire!</small>
+              <small class="text-danger" *ngIf="phoneNumber.errors?.['pattern']" >Ce champ est invalide</small>
+            </ng-container>
+            </ng-container>
+          </div>
+
+          <div class="mb-3 col-md-6">
+            <label>Ville du praticien </label>
+            <ng-container *ngIf="!selectedRow">
+              <input type="text" ngModel name="ville" class="form-control" autocomplete="off"
+                     pattern="^([a-zA-Z]+\s)*[a-zA-Z]{1,50}$"  #ville="ngModel" [class.is-invalid]="ville.invalid && ville.touched">
+              <div *ngIf="ville.errors && (ville.invalid && ville.touched)">
+                <small class="text-danger" *ngIf="ville.errors?.['required']" >Ce champ est obligatoire!</small>
+                <small class="text-danger" *ngIf="ville.errors?.['pattern']" >Ce champ est invalide</small>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="selectedRow">
+              <input type="text" ngModel="{{ selectedRow.ville }}" name="ville" class="form-control"
+                     autocomplete="off"
+                     pattern="^([a-zA-Z]+\s)*[a-zA-Z]{1,50}$"  #ville="ngModel" [class.is-invalid]="ville.invalid && ville.touched">
+              <div *ngIf="ville.errors && (ville.invalid && ville.touched)">
+                <small class="text-danger" *ngIf="ville.errors?.['required']" >Ce champ est obligatoire!</small>
+                <small class="text-danger" *ngIf="ville.errors?.['pattern']" >Ce champ est invalide</small>
+              </div>
+            </ng-container>
+          </div></div>
+          <div class="row m-1 border border-3 rounded-3">
+          <div class="mb-3 col-md-12">
+            <label>Adresse du praticien </label>
+            <ng-container *ngIf="!selectedRow">
+            <input type="text" ngModel name="adresse" class="form-control" autocomplete="off"
+                   #adresse="ngModel" [class.is-invalid]="adresse.invalid && adresse.touched" pattern="^([a-zA-Z0-9]+\s)*[a-zA-Z0-9_]{1,100}$">
+              <ng-container *ngIf="adresse.errors && (adresse.invalid && adresse.touched)">
+                <small class="text-danger" *ngIf="adresse.errors?.['pattern']" >Ce champ est invalide</small>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="selectedRow">
+            <input type="text" ngModel="{{ selectedRow.adresse }}" name="adresse" class="form-control"
+                   autocomplete="off"
+                   #adresse="ngModel" [class.is-invalid]="adresse.invalid && adresse.touched" pattern="^([a-zA-Z0-9]+\s)*[a-zA-Z0-9_]{1,100}$">
+              <ng-container *ngIf="adresse.errors && (adresse.invalid && adresse.touched)">
+                <small class="text-danger" *ngIf="adresse.errors?.['pattern']" >Ce champ est invalide</small>
+              </ng-container>
+            </ng-container>
+          </div></div>
+
+          <div class="row m-1 border border-3 rounded-3">
+          <div class="mb-3 col-md-12">
+            <label for="exampleFormControlTextarea1" class="form-label">Description du praticien </label>
+            <ng-container *ngIf="!selectedRow">
+            <textarea class="form-control" id="exampleFormControlTextarea2" rows="4" autocomplete="off"
+                      ngModel name="description"
+                      #description="ngModel" [class.is-invalid]="description.invalid && description.touched"></textarea>
+            </ng-container>
+            <ng-container *ngIf="selectedRow">
+            <textarea class="form-control" id="exampleFormControlTextarea1" rows="4"
+                      ngModel="{{selectedRow.description}}" name="description" autocomplete="off"
+                      #description="ngModel" [class.is-invalid]="description.invalid && description.touched"></textarea>
+            </ng-container>
+          </div></div></div>
+
+        </div>
+
+        <br>
+        <hr style="border-bottom: 2px solid ;">
+        <br>
+
+        <div class="col-md-12"><span style="padding-left: 24.5%;"></span>
+          <button class="btn ssss" style="width: 150px;" [disabled]="addForm.invalid || selectedRow || praFisVerif == true || praVerif == true"  data-bs-toggle="modal" data-bs-target="#AjouterModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+            </svg>
+            Ajouter</button>
+
+
+          <!-- Modal -->
+          <div class="modal fade" id="AjouterModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title" id="addModal1">Modification</h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Voulez-vous vraiment ajouter ce praticien ?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                  <button type="button" class="btn yes" (click)="onaddPraticien(addForm)" data-bs-dismiss="modal">Oui</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <span style="padding-left: 2em"></span>
+          <button class="btn ssss" style="width: 150px;" [disabled]="!selectedRow || addForm.form.invalid || (praVerif == true && eq == false) || (praFisVerif == true && eqFis == false)"  data-bs-toggle="modal" data-bs-target="#updateModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+              <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+            </svg>
+            Modifier</button>
+
+          <!-- Modal -->
+          <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title" id="updateModal1">Modification</h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Voulez-vous vraiment modifier ce praticien ?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                  <button type="button" class="btn yes" (click)="onupdatePraticien(addForm)" data-bs-dismiss="modal">Oui</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <span style="padding-left: 2em"></span>
+          <button class="btn ssee" style="width: 150px;" [disabled]="!selectedRow || addForm.form.invalid"  data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+              <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+            </svg>
+            Supprimer</button>
+          <!-- Modal -->
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title" id="exampleModalLabel">Suppression</h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Voulez-vous vraiment supprimer ce praticien ?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                  <button type="button" class="btn yes" (click)="onDeletePraticien(selectedRow.id,addForm)" data-bs-dismiss="modal">Oui</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <span style="padding-left: 2em"></span><button class="btn ssee" style="width: 150px;" (click)="cancelClick(addForm)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+              <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+            </svg>
+            Réinitialiser</button>
+        </div>
+    </form>
+ </div>
+  <br><br>
+</div>
+<br>
+<br>
+

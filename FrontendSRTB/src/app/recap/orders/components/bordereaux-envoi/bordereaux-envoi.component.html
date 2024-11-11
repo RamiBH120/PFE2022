@@ -1,0 +1,1911 @@
+
+<div class="container-fluid" >
+  <div class="row border border-3 rounded-bottom shadow-sm bg-body rounded">
+    <div>
+      <h4 class="p-3 fs-4 text-secondary text-center">Gestion des bordereaux d'envoi</h4>
+    </div>
+  </div>
+</div>
+
+<br>
+
+<div class="row justify-content-between">
+  <div class="col-2" style="padding-left: 2em;">
+    <button style="width: 130px" class="btn impr" [disabled]="!selectedRowBorEnv" (click)="pdfGenerateBorEnv()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+        <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+        <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+      </svg>
+      Imprimer</button>
+  </div>
+  <div class="col-3">
+    <mat-form-field class="example-full-width" style="width: 90% ;">
+      <input matInput placeholder="Chercher un bordereau d'envoi" autocomplete="off" #name (keyup)="findBorEnvByName(name)">
+    </mat-form-field>
+  </div>
+</div>
+<br>
+
+<table mat-table [dataSource]="dataSourceBorEnv" class="mat-elevation-z8" style="width: 100%;">
+
+  <ng-container matColumnDef="nom">
+    <th mat-header-cell *matHeaderCellDef> RÉFÉRENCE DU BORDEREAU D'ENVOI </th>
+    <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="dateDebut">
+    <th mat-header-cell *matHeaderCellDef> DATE DE DÉBUT DU BORDEREAU D'ENVOI </th>
+    <td mat-cell *matCellDef="let element"> {{element.dateDebut}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="dateFin">
+    <th mat-header-cell *matHeaderCellDef> DATE DE FIN DU BORDEREAU D'ENVOI</th>
+    <td mat-cell *matCellDef="let element"> {{element.dateFin}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="nbrbs">
+    <th mat-header-cell *matHeaderCellDef> NOMBRE DES BULLETINS DE SOINS </th>
+    <td mat-cell *matCellDef="let element"> {{element.bulletinSoinList.length}} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumnsBE;sticky:true"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumnsBE;" class="cursor"
+      (click)="onRowClicked(row,BSForm,ActeBS)"
+      [ngClass]="{'highlight': highlightBE()==row.id}"></tr>
+</table>
+
+
+<mat-paginator [length]="100"
+               [pageSize]="3"
+               [pageSizeOptions]="[1,3, 6 , 9 , 12]">
+</mat-paginator>
+
+<div class="container-fluid">
+    <div class="row mr-2 ml-2">
+      <form #addForm="ngForm" class="mt-5 border p-4 bg-light shadow rounded-3">
+        <h4 class="mb-5 fs-4 text-secondary">Informations sur la gestion des bordereaux d'envoi</h4>
+        <div class="row">
+          <div class="col bordright mt-2">
+
+
+            <div class="row border border-3 rounded-3 m-1">
+          <div class="mb-3 col-md-6">
+            <label>Référence du bordereau d'envoi <span class="text-danger">*</span></label>
+            <ng-container *ngIf="!selectedRowBorEnv">
+            <input type="text" ngModel name="nom" class="form-control"
+                   (keyup)="ExistNomBordEnv(nom.value)"
+                   (focus)="ExistNomBordEnv(nom.value)"
+                   (change)="ExistNomBordEnv(nom.value)" required
+                   pattern="^[A-Za-z][0-9A-Za-z-]{2,20}$"  #nom="ngModel" [class.is-invalid]="nom.invalid && nom.touched" autocomplete='off'>
+            <small class="text-danger" *ngIf="(bord==true && nom.value && !nom.errors && nom.touched)">{{bordExpression}}</small>
+            <div *ngIf="nom.errors && (nom.invalid && nom.touched)">
+              <small class="text-danger" *ngIf="nom.errors?.['required']" >Ce champ est obligatoire!</small>
+              <small class="text-danger" *ngIf="nom.errors?.['pattern']" >Ce champ est invalide</small>
+            </div>
+            </ng-container>
+            <ng-container *ngIf="selectedRowBorEnv">
+            <input type="text" ngModel="{{ selectedRowBorEnv.nom}}" name="nom" class="form-control"
+                   (keyup)="ExistNomBordEnv(nom.value) || equalsNom(selectedRowBorEnv.nom,nom.value)"
+                   (focus)="ExistNomBordEnv(nom.value) || equalsNom(selectedRowBorEnv.nom,nom.value)"
+                   (change)="ExistNomBordEnv(nom.value) && equalsNom(selectedRowBorEnv.nom,nom.value)" required
+                   pattern="^[A-Za-z][0-9A-Za-z-]{2,20}$"  #nom="ngModel" [class.is-invalid]="nom.invalid && nom.touched" autocomplete='off'>
+            <small class="text-danger" *ngIf="(bord==true && (eqNom==false) &&
+                 nom.value && !nom.errors)">{{bordExpression}}</small>
+            <div *ngIf="nom.errors && (nom.invalid && nom.touched)">
+              <small class="text-danger" *ngIf="nom.errors?.['required']" >Ce champ est obligatoire!</small>
+              <small class="text-danger" *ngIf="nom.errors?.['pattern']" >Ce champ est invalide</small>
+            </div>
+            </ng-container>
+          </div>
+            </div>
+
+          <div class="row border border-3 rounded-3 m-1">
+            <div class="mb-3 col-md-6">
+              <label>Date de début du bordereau d'envoi <span class="text-danger">*</span></label>
+              <ng-container *ngIf="!selectedRowBorEnv">
+              <input type="text" ngModel name="dateDebut"  class="form-control" placeholder="YYYY-MM-DD"
+                     onfocus="(this.type='date')"
+                     onblur="(this.type='text')" required
+                     #dateDebut="ngModel" [class.is-invalid]="dateDebut.invalid && dateDebut.touched" autocomplete='off'>
+              <small class="text-danger" [class.d-none]="dateDebut.valid || dateDebut.untouched">Ce champ est obligatoire!</small>
+              </ng-container>
+              <ng-container *ngIf="selectedRowBorEnv">
+              <input type="text" ngModel="{{selectedRowBorEnv.dateDebut}}" name="dateDebut" class="form-control" placeholder="YYYY-MM-DD"
+                     onfocus="(this.type='date')"
+                     onblur="(this.type='text')" required
+                     #dateDebut="ngModel" [class.is-invalid]="dateDebut.invalid && dateDebut.touched" autocomplete='off'>
+              <small class="text-danger" [class.d-none]="dateDebut.valid || dateDebut.untouched">Ce champ est obligatoire!</small>
+              <small class="text-danger" *ngIf="(validateDateWithBordAndBS(dateDebut.value) == false) || (validationDateStartBordWithActeBS(dateDebut.value) == false)">Il faut une date de debut qui soit inférieur aux dates des B.S et Actes BS.</small>
+              </ng-container>
+            </div>
+
+            <div class="mb-3 col-md-6">
+              <label>Date de fin du bordereau d'envoi <span class="text-danger">*</span></label>
+              <ng-container *ngIf="!selectedRowBorEnv && addForm.form.controls['dateDebut']">
+              <input type="text" [disabled]="addForm.form.controls['dateDebut'].invalid || !(addForm.form.controls['dateDebut'].value)"
+                     ngModel name="dateFin" class="form-control" placeholder="YYYY-MM-DD"
+                     onfocus="(this.type='date')"
+                     onblur="(this.type='text')" required
+                     #dateFin="ngModel" [class.is-invalid]="dateFin.invalid && dateFin.touched" autocomplete='off'>
+              <small class="text-danger" *ngIf="validateDates(addForm.form.controls['dateDebut'].value,dateFin.value)==false && dateFin.touched">La date de fin doit etre plus grande que la date de debut.</small>
+              </ng-container>
+              <ng-container *ngIf="selectedRowBorEnv">
+              <input type="text" [disabled]="addForm.form.controls['dateDebut'].invalid || !(addForm.form.controls['dateDebut'].value)" ngModel="{{selectedRowBorEnv.dateFin}}" name="dateFin" class="form-control" placeholder="YYYY-MM-DD"
+                     onfocus="(this.type='date')"
+                     onblur="(this.type='text')" required
+                     #dateFin="ngModel" [class.is-invalid]="dateFin.invalid && dateFin.touched" autocomplete='off'>
+              <small class="text-danger" *ngIf="(validateDates(addForm.form.controls['dateDebut'].value,dateFin.value)==false && dateFin.touched)
+             || (validationDateEndBordWithBS(dateFin.value)==false) || (validationDateEndBordWithActeBS(dateFin.value)==false)">La date de fin doit etre plus grande que la date de (debut,B.S,Acte du B.S).</small>
+              </ng-container>
+            </div>
+
+          </div>
+            <div class="row border border-3 rounded-3 m-1">
+          <div class="mb-3 col-md-12">
+            <label for="exampleFormControlTextarea1" class="form-label">Description du bordereau d'envoi </label>
+            <ng-container *ngIf="!selectedRowBorEnv">
+            <textarea class="form-control" id="exampleFormControlTextarea2" rows="4"
+                      ngModel name="description" autocomplete="off"
+                      #description="ngModel" [class.is-invalid]="description.invalid && description.touched"></textarea>
+            </ng-container>
+            <ng-container *ngIf="selectedRowBorEnv">
+            <textarea class="form-control" id="exampleFormControlTextarea1" rows="4"
+                      ngModel="{{selectedRowBorEnv.description}}" name="description" autocomplete="off"
+                      #description="ngModel" [class.is-invalid]="description.invalid && description.touched"></textarea>
+            </ng-container>
+          </div>
+            </div>
+          </div>
+
+          <div class="col bordleft mt-2">
+          <div class="row justify-content-between m-1">
+          <div class="col-5">
+            <h2 class="m-1 text-secondary">Liste des bulletins de soins </h2>
+          </div>
+          <div class="col-5">
+            <mat-form-field class="example-full-width" style="width: 105% ;">
+              <input matInput placeholder="Chercher un bulletin de soin" autocomplete="off" #prenom (keyup)="findBSByPren(prenom)">
+            </mat-form-field>
+          </div>
+          </div>
+          <cdk-virtual-scroll-viewport itemSize="48" style="height: 350px;width: 100%;">
+            <table mat-table [dataSource]="dataSourceBSparBorEnv" class="mat-elevation-z8" style="width: 890px;">
+
+              <ng-container matColumnDef="numbs">
+                <th mat-header-cell *matHeaderCellDef> NUMÉRO DE BULLETIN DE SOIN</th>
+                <td mat-cell *matCellDef="let element"> {{element.numbs}} </td>
+              </ng-container>
+              <ng-container matColumnDef="numaff">
+                <th mat-header-cell *matHeaderCellDef>MATRICULE AGENT (STAR)</th>
+                <td mat-cell *matCellDef="let element"> {{element.agent.matstar}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="typemalade">
+                <th mat-header-cell *matHeaderCellDef>TYPE MALADE</th>
+                <td mat-cell *matCellDef="let element"> {{element.typemalade}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="datebs">
+                <th mat-header-cell *matHeaderCellDef> DATE DE BULLETIN DE SOIN </th>
+                <td mat-cell *matCellDef="let element"> {{element.datebs}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="nbracte">
+                <th mat-header-cell *matHeaderCellDef> NOMBRE DES ACTES PAR B.S </th>
+                <td mat-cell *matCellDef="let element"> {{element.acteBS.length}} </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumnsBS;sticky:true"></tr>
+              <tr mat-row *matRowDef="let row1; columns: displayedColumnsBS;" class="cursor"
+                  (click)="onRowClicked2(row1,ActeBS)"
+                  [ngClass]="{'highlight': highlightBS()==row1.id}"></tr>
+            </table>
+          </cdk-virtual-scroll-viewport>
+          </div>
+        </div><br>
+        <hr style="border-bottom: 2px solid ;width: 100%">
+        <div class="row">
+        <div class="col-md-12">
+          <span style="padding-left: 26%;"></span>
+          <button style="width: 150px" class="btn ssss" [disabled]="addForm.invalid || selectedRowBorEnv || isValidDate==false"  data-bs-toggle="modal" data-bs-target="#AjouterModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+            </svg>
+            Ajouter</button>
+
+
+          <!-- Modal -->
+          <div class="modal fade" id="AjouterModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title" id="addModal1">Addition</h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Voulez-vous vraiment ajouter ce bordereau d'envoi ?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                  <button type="button" class="btn yes" (click)="onaddBorEnv(addForm,BSForm)" data-bs-dismiss="modal">Oui</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <span style="padding-left: 2em"></span>
+          <button style="width: 150px" class="btn ssss" [disabled]="!selectedRowBorEnv || addForm.form.invalid || isValidDate==false || verificationBS==false || verificationActeBS==false || verifEnd==false || verifEndActeBS==false || (eqNom==false && bord==true) || selectedrow2"  data-bs-toggle="modal" data-bs-target="#updateModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+              <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+            </svg>
+            Modifier</button>
+
+          <!-- Modal -->
+          <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title" id="updateModal1">Modification</h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Voulez-vous vraiment modifier ce bordereau d'envoi ?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                  <button type="button" class="btn yes" (click)="onupdateBorEnv(addForm,BSForm)" data-bs-dismiss="modal">Oui</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <span style="padding-left: 2em"></span>
+          <button class="btn ssee" style="width: 150px" [disabled]="!selectedRowBorEnv || addForm.form.invalid || isValidDate==false || verificationBS==false || verificationActeBS==false || verifEnd==false || verifEndActeBS==false || selectedrow2"  data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+              <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+            </svg>
+            Supprimer</button>
+          <!-- Modal -->
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title" id="exampleModalLabel">Suppression</h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Voulez-vous vraiment supprimer ce bordereau d'envoi ?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                  <button type="button" class="btn yes" (click)="onDeleteBorEnv(selectedRowBorEnv.id,addForm,BSForm)" data-bs-dismiss="modal">Oui</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <span style="padding-left: 2em"></span><button style="width: 150px" class="btn ssee" (click)="cancelClick(addForm,BSForm)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+          </svg>
+          Réinitialiser</button>
+        </div></div>
+
+      </form>
+  </div>
+</div>
+<div class="container-fluid">
+    <div class="row mr-3 ml-3">
+      <form #BSForm="ngForm" class="mt-5 border p-4 bg-light shadow rounded-3" >
+        <h4 class="mb-5 fs-4 text-secondary">Informations sur la gestion des bulletins de soins</h4>
+
+        <div class="row">
+          <div class="col bordright mt-3">
+          <form #BSFormForSomme="ngForm" class="m-1">
+            <div style="padding-bottom: 10px ;right: 150px;position: relative;">
+              <mat-button-toggle #group value="red"
+                 style="width: 300px;height:40px;align-items: center;border-radius: 25px;background-color: #039BE5;color: white;" class="go" type="button" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="false" aria-controls="collapseExample">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                </svg>
+                Afficher les informations sur ce B.S
+              </mat-button-toggle>
+            </div>
+            <div style="width: 101%;position:relative;right: 0.5%">
+            <div class="row border border-3 rounded-3 m-1  collapse"  id="collapse">
+
+
+              <div class="mb-3 col-md-4">
+                <label>Somme des médecins </label>
+                <div class="input-group">
+                  <input type="text" ngModel="{{ somMontMed }}" name="sommeTotMed"
+                         #sommeTotMed="ngModel" autocomplete="off"
+                         class="form-control" readonly>
+                  <div class="input-group-append"><span class="input-group-text">DT</span></div>
+                </div>
+              </div>
+
+              <div class="mb-3 col-md-4">
+                <label>Somme des praticiens </label>
+                <div class="input-group">
+                  <input type="text" ngModel="{{ somMontPrati }}" name="sommeTotPrati"
+                         #sommeTotPrati="ngModel" autocomplete="off"
+                         class="form-control" readonly>
+                  <div class="input-group-append"><span class="input-group-text">DT</span></div>
+                </div>
+              </div>
+
+              <div class="mb-3 col-md-4">
+                <label>Somme des pharmacies </label>
+                <div class="input-group">
+                  <input type="text" ngModel="{{ somMontPhar }}" name="sommeTotPhar"
+                         #sommeTotPhar="ngModel" autocomplete="off"
+                         class="form-control" readonly>
+                  <div class="input-group-append"><span class="input-group-text">DT</span></div>
+                </div>
+              </div>
+
+              <div class="mb-3 col-md-6">
+                <label>Somme total de ce bulletin de soin </label>
+                <div class="input-group">
+                  <input type="text" ngModel="{{ somMontParBull }}" name="sommeTotBull"
+                         #sommeTotBull="ngModel" autocomplete="off"
+                         class="form-control" readonly>
+                  <div class="input-group-append"><span class="input-group-text">DT</span></div>
+                </div>
+              </div>
+
+              <div class="mb-3 col-md-6">
+                <label>Somme du restant de ce bulletin de soin </label>
+                <div class="input-group">
+                  <input type="text" ngModel="{{ somMontRes }}" name="sommeTotRestant"
+                         #sommeTotRestant="ngModel" autocomplete="off"
+                         class="form-control" readonly>
+                  <div class="input-group-append"><span class="input-group-text">DT</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          </form>
+            <small style="padding-left: 1%" *ngIf="alo==true && selectedrow2.agent.matstar == BSForm.form.controls['numaff'].value" class="text-danger">L'agent " {{agName}} {{agPrenom}} " a dépassé le plafond désiré!.</small>
+            <div class="row border border-3 rounded-3 m-1">
+              <div class="mb-3 col-md-6">
+
+                <label>Numéro d'affiliation (matricule STAR) <span class="text-danger">*</span></label>
+                <ng-container *ngIf="!selectedrow2">
+                <input type="text" ngModel name="numaff" class="form-control" required
+                       (keyup)="ExistAg(numaff.value) || setEnfants(numaff.value) || ExistConj(numaff.value)"
+                       (focus)="ExistAg(numaff.value) || setEnfants(numaff.value) || ExistConj(numaff.value)"
+                       (change)="ExistAg(numaff.value) && setEnfants(numaff.value) && ExistConj(numaff.value)"
+                       pattern="^[0-9]{1,10}$"  autocomplete='off'
+                       (keyup)="FindListAg(numaff.value,BSForm)"
+                       (change)="FindListAg(numaff.value,BSForm)"
+                       #numaff="ngModel" [class.is-invalid]="numaff.invalid && numaff.touched"
+                       [disabled]="!selectedRowBorEnv" list="list-agent">
+                  <datalist id="list-agent">
+                    <option *ngFor="let Agent of opAgent " [value]="Agent.matstar">
+                      {{ Agent.matstar + ' : ' + Agent.nom + ' '  + Agent.prenom }}
+                    </option>
+                  </datalist>
+
+                <small class="text-danger" *ngIf="nyBS==false && !numaff.errors && numaff.value && numaff.touched">{{ny}}</small>
+                <div *ngIf="numaff.errors && (numaff.invalid && numaff.touched)">
+                  <small class="text-danger" *ngIf="numaff.errors?.['required']" >Ce champ est obligatoire!</small>
+                  <small class="text-danger" *ngIf="numaff.errors?.['pattern']" >Ce champ est invalide</small>
+                </div>
+                </ng-container>
+                <ng-container *ngIf="selectedrow2">
+                <input type="text" ngModel="{{selectedrow2.agent.matstar}}" name="numaff" class="form-control" required
+                       pattern="^[0-9]{1,10}$"  #numaff="ngModel" [class.is-invalid]="numaff.invalid && numaff.touched"
+                       [disabled]="!selectedRowBorEnv"
+                       [readOnly]="checkAff()==true"
+                       autocomplete='off'
+                       (keyup)="ExistAg(numaff.value) || setEnfants(numaff.value)"
+                       (focus)="ExistAg(numaff.value) || setEnfants(numaff.value)"
+                       (change)="ExistAg(numaff.value) && setEnfants(numaff.value)"
+                       (keyup)="FindListAg(numaff.value,BSForm)"
+                       (change)="FindListAg(numaff.value,BSForm)"
+                       (keyup)="Consi(numaff.value,BSForm)" list="list-agent2">
+                  <datalist id="list-agent2">
+                    <option *ngFor="let Agent of opAgent " [value]="Agent.matstar">
+                      {{ Agent.matstar + ' : ' + Agent.nom + ' '  + Agent.prenom }}
+                    </option>
+                  </datalist>
+                <small class="text-danger" *ngIf="nyBS==false && numaff.value && !numaff.errors && numaff.touched">{{ny}}</small>
+                <div *ngIf="numaff.errors && (numaff.invalid && numaff.touched)">
+                  <small class="text-danger" *ngIf="numaff.errors?.['required']" >Ce champ est obligatoire!</small>
+                  <small class="text-danger" *ngIf="numaff.errors?.['pattern']" >Ce champ est invalide</small>
+                </div>
+                </ng-container>
+              </div>
+              <ng-container *ngIf="BSForm.form.controls['numaff']">
+              <div class="mb-3 col-md-6" *ngIf="nyBS==false || !BSForm.form.controls['numaff'].value || mu == false">
+                <label>Nom et prénom de l'agent </label>
+                <input type="text" name="nomAgName" class="form-control" disabled>
+              </div>
+
+              <div class="mb-3 col-md-6" *ngIf="nyBS==true && BSForm.form.controls['numaff'].value && mu == true">
+                <label>Nom et prénom de l'agent </label>
+                <input type="text" ngModel="{{agName+' '+agPrenom}}" name="nomAgName" class="form-control" disabled>
+              </div></ng-container>
+            </div>
+
+            <div class="row border border-3 rounded-3 m-1">
+
+              <div class="mb-3 col-md-6">
+                <label>Numéro de bulletin de soin <span class="text-danger">*</span></label>
+                <ng-container *ngIf="!selectedrow2">
+                <input type="text" ngModel name="numbs" class="form-control"
+                       (keyup)="ExistAgBS(numbs.value)"
+                       (focus)="ExistAgBS(numbs.value)"
+                       (change)="ExistAgBS(numbs.value)"
+                       autocomplete='off' required
+                       pattern="^([1-9]{1}[0-9]{1,20})$"  #numbs="ngModel" [class.is-invalid]="numbs.invalid && numbs.touched"
+                       [disabled]="!selectedRowBorEnv">
+                <small *ngIf="numBS==true && numbs.value && !numbs.errors && numbs.touched" class="text-danger">{{num}}</small>
+                <div *ngIf="numbs.errors && (numbs.invalid && numbs.touched)">
+                  <small class="text-danger" *ngIf="numbs.errors?.['required']" >Ce champ est obligatoire!</small>
+                  <small class="text-danger" *ngIf="numbs.errors?.['pattern']" >Ce champ est invalide</small>
+                </div>
+                </ng-container>
+                <ng-container *ngIf="selectedrow2">
+                <input type="text" ngModel="{{selectedrow2.numbs}}" name="numbs" class="form-control" required
+                       pattern="^([1-9]{1}[0-9]{1,20})$" autocomplete='off'
+                       (keyup)="ExistAgBS(numbs.value) || equalsNumBS(selectedrow2.numbs,numbs.value)"
+                       (focus)="ExistAgBS(numbs.value) || equalsNumBS(selectedrow2.numbs,numbs.value)"
+                       (change)="ExistAgBS(numbs.value) && equalsNumBS(selectedrow2.numbs,numbs.value)"
+                       #numbs="ngModel" [class.is-invalid]="numbs.invalid && numbs.touched"
+                       [disabled]="!selectedRowBorEnv">
+                <small class="text-danger" *ngIf="(numBS==true && (eqnumBS==false) && numbs.touched &&
+                 numbs.value && !numbs.errors)">{{num}}</small>
+                <div *ngIf="numbs.errors && (numbs.invalid && numbs.touched)">
+                  <small class="text-danger" *ngIf="numbs.errors?.['required']" >Ce champ est obligatoire!</small>
+                  <small class="text-danger" *ngIf="numbs.errors?.['pattern']" >Ce champ est invalide</small>
+                </div>
+                </ng-container>
+              </div>
+
+
+              <div class="mb-3 col-md-6">
+                <label>Date du bulletin de soin <span class="text-danger">*</span></label>
+                <ng-container *ngIf="!selectedrow2">
+                <input type="text" ngModel  name="datebs" class="form-control"
+                       placeholder="YYYY-MM-DD"
+                       onfocus="(this.type='date')"
+                       onblur="(this.type='text')" autocomplete='off'
+                       #datebs="ngModel" [class.is-invalid]="datebs.invalid && datebs.touched" required
+                       [disabled]="!selectedRowBorEnv">
+                <small class="text-danger"
+                       *ngIf="selectedRowBorEnv && validateDatesBS(datebs.value,selectedRowBorEnv.dateFin)==false && datebs.value">
+                  La date de bulletin de soin doit etre inférieur à la date de fin de " {{selectedRowBorEnv.nom}} ".
+                </small>
+                <small class="text-danger"
+                       *ngIf="selectedRowBorEnv && validateDatesBSStart(datebs.value,selectedRowBorEnv.dateDebut)==false && datebs.value">
+                  La date de bulletin de soin doit etre supérieur à la date de début de " {{selectedRowBorEnv.nom}} ".
+                </small>
+                <small class="text-danger" *ngIf="datebs.touched && datebs.errors?.['required']">
+                  Ce champ est obligatoire!</small>
+                </ng-container>
+                <ng-container *ngIf="selectedrow2">
+                <input type="text" ngModel="{{selectedrow2.datebs}}" name="datebs" class="form-control"
+                       placeholder="YYYY-MM-DD"
+                       onfocus="(this.type='date')"
+                       onblur="(this.type='text')" autocomplete='off'
+                       #datebs="ngModel" [class.is-invalid]="datebs.invalid && datebs.touched" required
+                       [disabled]="!selectedRowBorEnv">
+                <small class="text-danger"
+                       *ngIf="selectedRowBorEnv && validateDatesBS(datebs.value,selectedRowBorEnv.dateFin)==false && datebs.value">
+                  La date de bulletin de soin doit etre inférieur à la date de fin de " {{selectedRowBorEnv.nom}} ".
+                </small>
+                <small class="text-danger"
+                       *ngIf="selectedRowBorEnv && validateDatesBSStart(datebs.value,selectedRowBorEnv.dateDebut)==false && datebs.value">
+                  La date de bulletin de soin doit etre supérieur à la date de début de " {{selectedRowBorEnv.nom}} ".
+                </small>
+                <small class="text-danger" *ngIf="datebs.touched && datebs.errors?.['required']">
+                  Ce champ est obligatoire!</small>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="row border border-3 rounded-3 m-1" *ngIf="nyBS==true && mu==true && BSForm.form.controls['numaff'].value">
+              <div class="mb-3 col-md-6">
+                <label>Type de malade <span class="text-danger">*</span></label>
+                <ng-container *ngIf="!selectedrow2">
+                <select type="text" ngModel name="typemalade" class="form-select" required style="cursor: pointer"
+                        #typemalade="ngModel"
+                        (click)="CheckTypeMalade(typemalade.value,BSForm.form.controls['numaff'].value) || setList()"
+                        [class.is-invalid]="typemalade.invalid && typemalade.touched"
+                        [disabled]="!selectedRowBorEnv || (nyBS==false || mu==false)">
+                  <option *ngFor="let option of options" [value]="option">
+                    {{option}}
+                  </option>
+                </select>
+                <div *ngIf="typemalade.errors && (typemalade.invalid && typemalade.touched)">
+                  <small class="text-danger" *ngIf="typemalade.errors?.['required']" >Ce champ est obligatoire!</small>
+                </div>
+                </ng-container>
+
+                <ng-container *ngIf="selectedrow2">
+                <select type="text" ngModel="{{selectedrow2.typemalade}}" name="typemalade" class="form-select" required style="cursor: pointer"
+                        #typemalade="ngModel" [class.is-invalid]="typemalade.invalid && typemalade.touched"
+                        (click)="CheckTypeMalade(typemalade.value,BSForm.form.controls['numaff'].value) || setList()">
+                  <option *ngFor="let option of options" [value]="option" [attr.selected]="selectedrow2.typemalade==option ? true : null">
+                    {{option}}
+                  </option>
+                </select>
+                <div *ngIf="typemalade.errors && (typemalade.invalid && typemalade.touched)">
+                  <small class="text-danger" *ngIf="typemalade.errors?.['required']" >Ce champ est obligatoire!</small>
+                </div>
+                </ng-container>
+              </div>
+
+              <div class="mb-3 col-md-6" *ngIf="!BSForm.form.controls['typemalade'].value">
+                <label>Nom et prénom du malade </label>
+                <ng-container *ngIf="!selectedrow2">
+                <input type="text" name="nomAgNameTypeMalade" class="form-control" disabled>
+                </ng-container>
+                  <ng-container *ngIf="selectedrow2">
+                    <input type="text" name="prenomAgPrenomTypeMalade" class="form-control" disabled></ng-container>
+              </div>
+
+              <div class="mb-3 col-md-6" *ngIf="BSForm.form.controls['typemalade'].value">
+                <label>Nom et prénom du malade </label>
+                <ng-container *ngIf="!selectedrow2">
+                <input type="text" ngModel="{{agTypeMaladeNom+' '+agTypeMaladePrenom}}" name="nomAgNameTypeMalade" class="form-control" disabled>
+                </ng-container>
+                <ng-container *ngIf="selectedrow2">
+                  <input type="text" ngModel="{{agTypeMaladeNom + ' ' + agTypeMaladePrenom}}"
+                         name="prenomAgPrenomTypeMalade" class="form-control" disabled></ng-container>
+              </div>
+
+            </div>
+
+            <div class="row border border-3 rounded-3 m-1" *ngIf="nyBS==false || mu==false || !BSForm.form.controls['numaff'].value">
+              <div class="mb-3 col-md-6">
+                <label>Type de malade <span class="text-danger">*</span></label>
+                <ng-container *ngIf="!selectedrow2">
+                <select type="text" ngModel name="typemalade" class="form-select" required
+                        #typemalade="ngModel"
+                        disabled>
+                  <option *ngFor="let option of options" [value]="">
+                    {{option}}
+                  </option>
+                </select>
+                <div *ngIf="typemalade.errors && (typemalade.invalid && typemalade.touched)">
+                  <small class="text-danger" *ngIf="typemalade.errors?.['required']" >Ce champ est obligatoire!</small>
+                </div>
+                </ng-container>
+                <ng-container *ngIf="selectedrow2">
+                <select type="text" ngModel name="typemalade" class="form-select" required
+                        #typemalade="ngModel">
+                  <option *ngFor="let option of options" [value]="">
+                    {{option}}
+                  </option>
+                </select>
+                <div *ngIf="typemalade.errors && (typemalade.invalid && typemalade.touched)">
+                  <small class="text-danger" *ngIf="typemalade.errors?.['required']" >Ce champ est obligatoire!</small>
+                </div>
+                </ng-container>
+              </div>
+              <div class="mb-3 col-md-6">
+                <label>Nom et prénom du malade </label>
+                <input type="text" name="nomAgNameTypeMalade" class="form-control" disabled>
+              </div>
+
+            </div>
+
+        </div>
+          <div class="col bordleft mt-2">
+            <div class="row justify-content-between">
+              <div class="col-6">
+                <h2 class="m-1 text-secondary">Liste des actes par bulletin de soin </h2>
+              </div>
+              <div class="col-4">
+                <mat-form-field class="example-full-width" style="width: 100%;">
+                  <input matInput placeholder="Chercher un acte" autocomplete="off" #full (keyup)="findActeBSByFull(full)">
+                </mat-form-field>
+              </div>
+            </div>
+        <cdk-virtual-scroll-viewport itemSize="48" style="height: 320px;width: 100%;" *ngIf="!group.checked">
+          <table mat-table [dataSource]="dataSourceActeBS" class="mat-elevation-z8" style="width: 890px;">
+
+            <!--- Note that these columns can be defined in any order.
+                  The actual rendered columns are set as a property on the row definition" -->
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="codeActeBS">
+              <th mat-header-cell *matHeaderCellDef> CODE ACTE PAR B.S </th>
+              <td mat-cell *matCellDef="let element"> {{element.acteMedical.code}} </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="montantActeBS">
+              <th mat-header-cell *matHeaderCellDef> MONTANT ACTE PAR B.S (DT) </th>
+              <td mat-cell *matCellDef="let element"> {{element.montantActeBS}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="beneficiaire">
+              <th mat-header-cell *matHeaderCellDef> BÉNÉFICIAIRE ACTE PAR B.S</th>
+              <td mat-cell *matCellDef="let element"> {{element.beneficiaire}} </td>
+            </ng-container>
+            <ng-container matColumnDef="dateActeBS">
+              <th mat-header-cell *matHeaderCellDef> DATE ACTE PAR B.S</th>
+              <td mat-cell *matCellDef="let element"> {{element.dateActeBS}} </td>
+            </ng-container>
+
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumnsActeBS;sticky:true"></tr>
+            <tr mat-row *matRowDef="let row2; columns: displayedColumnsActeBS;" class="cursor"
+                (click)="onRowClicked3(row2)"
+                [ngClass]="{'highlight': highlightActeBS()==row2.id}"></tr>
+          </table>
+        </cdk-virtual-scroll-viewport>
+            <cdk-virtual-scroll-viewport itemSize="48" style="height: 500px;width: 100%;" *ngIf="group.checked">
+              <table mat-table [dataSource]="dataSourceActeBS" class="mat-elevation-z8" style="width: 890px;">
+
+                <!--- Note that these columns can be defined in any order.
+                      The actual rendered columns are set as a property on the row definition" -->
+
+                <!-- Name Column -->
+                <ng-container matColumnDef="codeActeBS">
+                  <th mat-header-cell *matHeaderCellDef> CODE ACTE PAR B.S </th>
+                  <td mat-cell *matCellDef="let element"> {{element.acteMedical.code}} </td>
+                </ng-container>
+
+                <!-- Weight Column -->
+                <ng-container matColumnDef="montantActeBS">
+                  <th mat-header-cell *matHeaderCellDef> MONTANT ACTE PAR B.S (DT) </th>
+                  <td mat-cell *matCellDef="let element"> {{element.montantActeBS}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="beneficiaire">
+                  <th mat-header-cell *matHeaderCellDef> BÉNÉFICIAIRE ACTE PAR B.S</th>
+                  <td mat-cell *matCellDef="let element"> {{element.beneficiaire}} </td>
+                </ng-container>
+                <ng-container matColumnDef="dateActeBS">
+                  <th mat-header-cell *matHeaderCellDef> DATE ACTE PAR B.S</th>
+                  <td mat-cell *matCellDef="let element"> {{element.dateActeBS}} </td>
+                </ng-container>
+
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsActeBS;sticky:true"></tr>
+                <tr mat-row *matRowDef="let row2; columns: displayedColumnsActeBS;" class="cursor"
+                    (click)="onRowClicked3(row2)"
+                    [ngClass]="{'highlight': highlightActeBS()==row2.id}"></tr>
+              </table>
+            </cdk-virtual-scroll-viewport>
+        </div>
+        </div>
+
+        <br>
+        <hr style="border-bottom: 2px solid ;width: 100%">
+        <div class="row">
+          <ng-container *ngIf="!selectedrow2">
+            <div class="col-md-12 mt-1">
+              <span style="padding-left: 26%;"></span>
+            <button style="width: 150px" class="btn ssss go" [disabled]="BSForm.invalid || isValidDateBS==false || isValidDateBSS==false || nyBS== false || numBS==true || !selectedRowBorEnv"
+                    data-bs-toggle="modal" data-bs-target="#exampleModalBS">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+              </svg>
+              Ajouter</button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModalBS" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h2 class="modal-title" id="exampleModalLabelBS">Addition</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Voulez-vous vraiment ajouter ce bulletin de soin ?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                    <button type="button" class="btn yes" (click)="onaddBS(BSForm,selectedRowBorEnv.id,BSForm.form.controls['numaff'].value,ActeBS)" data-bs-dismiss="modal">Oui</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span style="padding-left: 2em"></span>
+            <button style="width: 150px" class="btn ssss go"  disabled>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+              </svg>
+              Modifier</button>
+            <span style="padding-left: 2em"></span>
+            <button class="btn ssee go" style="width: 150px" disabled >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+              </svg>
+              Supprimer</button>
+            <span style="padding-left: 2em"></span><button style="width: 150px" class="btn ssee" (click)="cancelClickBS(BSForm,ActeBS)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+              </svg>
+              Réinitialiser</button>
+          </div>
+          </ng-container>
+          <ng-container *ngIf="selectedrow2">
+            <div class="col-md-12">
+              <span style="padding-left: 26%;"></span>
+            <button style="width: 150px" class="btn ssss go" disabled>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+              </svg>
+              Ajouter</button>
+            <span style="padding-left: 2em"></span>
+            <button style="width: 150px" class="btn ssss go" [disabled]="BSForm.form.invalid || isValidDateBS==false ||
+                                        (nyBS==false) || isValidDateBSS==false ||
+                                         ((numBS == true) && (eqnumBS == false))"
+                    data-bs-toggle="modal" data-bs-target="#exampleModalEditBS">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+              </svg>
+              Modifier</button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModalEditBS" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h2 class="modal-title" id="exampleModalEditLabelBS1">Modification</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Voulez-vous vraiment modifier ce bulletin de soin ?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                    <button type="button" class="btn yes" (click)="onupdateBS(BSForm,selectedRowBorEnv.id,BSForm.form.controls['numaff'].value,selectedrow2.id,BSFormForSomme,ActeBS)" data-bs-dismiss="modal">Oui</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span style="padding-left: 2em"></span>
+            <button class="btn ssee go" style="width: 150px" [disabled]="BSForm.form.invalid || isValidDateBS==false || isValidDateBSS==false"
+                    data-bs-toggle="modal" data-bs-target="#exampleModalSuppBS">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+              </svg>
+              Supprimer</button>
+
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModalSuppBS" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h2 class="modal-title" id="exampleModalSuppLabelBS1">Supprission</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Voulez-vous vraiment supprimer ce bulletin de soin ?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                    <button type="button" class="btn yes" (click)="onDeleteBS(selectedrow2.id,BSForm,ActeBS)" data-bs-dismiss="modal">Oui</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <span style="padding-left: 2em"></span><button style="width: 150px" class="btn ssee" (click)="cancelClickBS(BSForm,ActeBS)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+              </svg>
+              Réinitialiser</button>
+          </div>
+          </ng-container>
+        </div>
+
+      </form>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row  mr-4 ml-4">
+          <form #ActeBS="ngForm" class="mt-5 border p-4 bg-light shadow rounded-3">
+            <h4 class="mb-5 fs-4 text-secondary">Informations sur la gestion des actes par bulletins de soin</h4>
+            <div class="col-md-6">
+              <form #AgentForm="ngForm">
+                <div  style="padding-bottom: 10px ;right: 150px;position: relative">
+                  <mat-button-toggle  style="width: 300px;height:40px;align-items: center;border-radius: 25px;background-color: #039BE5;color: white;" class="go" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                      <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                      <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                    </svg>
+                    Afficher les informations sur l'agent
+                  </mat-button-toggle>
+                </div>
+                <div style="width: 97.5%;position:relative;left: 0.3%">
+                <div class="row border border-3 rounded-3 mt-1 collapse"  id="collapseExample">
+                  <div class="mb-3 col-md-4">
+                    <label>Somme des bulletins de soins </label>
+                    <div class="input-group">
+                      <input type="text" ngModel="{{ sommeBull }}" name="sommeBulletinDeSoins"
+                             #sommeBulletinDeSoins="ngModel" autocomplete="off"
+                             class="form-control" readonly>
+                      <div class="input-group-append"><span class="input-group-text">DT</span></div>
+                    </div>
+                  </div>
+
+                  <div class="mb-3 col-md-4">
+                    <label>Somme des pharmacies </label>
+                    <div class="input-group">
+                      <input type="text" ngModel="{{ sommePhar }}" name="sommePharmacieActeBS"
+                             #sommePharmacieActeBS="ngModel" autocomplete="off"
+                             class="form-control" readonly>
+                      <div class="input-group-append"><span class="input-group-text">DT</span></div>
+                    </div>
+                  </div>
+
+                  <div class="mb-3 col-md-4">
+                    <label>Somme du restant des bulletins </label>
+                    <div class="input-group">
+                      <input type="text" ngModel="{{ sommeRes }}" name="sommerestant"
+                             #sommerestant="ngModel" autocomplete="off"
+                             class="form-control" readonly>
+                      <div class="input-group-append"><span class="input-group-text">DT</span></div>
+                    </div>
+                  </div>
+
+                </div>
+            </div>
+              </form></div>
+            <div class="row">
+
+
+                <div class="col bordright mt-2">
+
+
+                <div class="row border border-3 rounded-3 m-1">
+
+                  <div class="mb-3 col-md-6">
+                    <label>Code de l'acte <span class="text-danger">*</span></label>
+                    <ng-container *ngIf="!selectedActeBS">
+                    <input type="text" ngModel name="codeActeBS" class="form-control" required
+                           pattern="^[A-Z0-9]{1,20}$"  #codeActeBS="ngModel" [class.is-invalid]="codeActeBS.invalid && codeActeBS.touched"
+                           [disabled]="!selectedrow2" autocomplete='off'
+                           (focus)="findActeMedicalDesignation(codeActeBS.value)
+                            || ExistActeMedical(codeActeBS.value) || FindDesign(codeActeBS.value)"
+                           (keyup)="findActeMedicalDesignation(codeActeBS.value) || disableQueMont(ActeBS) ||
+                           ExistActeMedical(codeActeBS.value) || FindDesign(codeActeBS.value)"
+                           (change)="findActeMedicalDesignation(codeActeBS.value) && disableQueMont(ActeBS) &&
+                           ExistActeMedical(codeActeBS.value) && FindDesign(codeActeBS.value)"
+                           list="list-acteMedical">
+                    <datalist id="list-acteMedical">
+                      <option *ngFor="let listeActe of opActeMedical " [value]="listeActe.code">
+                        {{ listeActe.code }}
+                      </option>
+                    </datalist>
+                    <div *ngIf="codeActeBS.errors && (codeActeBS.invalid && codeActeBS.touched)">
+                      <small class="text-danger" *ngIf="codeActeBS.errors?.['required']" >Ce champ est obligatoire!</small>
+                      <small class="text-danger" *ngIf="codeActeBS.errors?.['pattern']" >Ce champ est invalide</small>
+                    </div>
+                    <small *ngIf="acteMedVerif == false && codeActeBS.value && !codeActeBS.errors && codeActeBS.touched"
+                           class="text-danger">{{ ExistActeMedCodeActeMed }}</small>
+
+                    </ng-container>
+                    <ng-container *ngIf="selectedActeBS">
+                    <input type="text" ngModel="{{selectedActeBS.acteMedical.code}}" name="codeActeBS" class="form-control" pattern="^[A-Z0-9]{1,20}$"  #codeActeBS="ngModel" [class.is-invalid]="codeActeBS.invalid && codeActeBS.touched"
+                           [disabled]="!selectedrow2" autocomplete='off'
+                           (focus)="findActeMedicalDesignation(codeActeBS.value) ||
+                            ExistActeMedical(codeActeBS.value) || FindDesign(codeActeBS.value)"
+                           (keyup)="findActeMedicalDesignation(codeActeBS.value) || disableQueMont(ActeBS) ||
+                            ExistActeMedical(codeActeBS.value) || FindDesign(codeActeBS.value)"
+                           (change)="findActeMedicalDesignation(codeActeBS.value) && disableQueMont(ActeBS) &&
+                            ExistActeMedical(codeActeBS.value) && FindDesign(codeActeBS.value)"
+                           list="list-acteMedical2">
+                    <datalist id="list-acteMedical2">
+                      <option *ngFor="let listeActe of opActeMedical " [value]="listeActe.code">
+                        {{ listeActe.code }}
+                      </option>
+                    </datalist>
+
+                    <div *ngIf="codeActeBS.errors && (codeActeBS.invalid && codeActeBS.touched)">
+                      <small class="text-danger" *ngIf="codeActeBS.errors?.['required']" >Ce champ est obligatoire!</small>
+                      <small class="text-danger" *ngIf="codeActeBS.errors?.['pattern']" >Ce champ est invalide</small>
+                    </div>
+                    <small *ngIf="acteMedVerif == false && codeActeBS.value && !codeActeBS.errors && codeActeBS.touched" class="text-danger">{{ ExistActeMedCodeActeMed }}</small>
+                    </ng-container>
+                  </div>
+
+                  <div class="mb-3 col-md-6" *ngIf="!ds">
+                    <label>Designation du code de l'acte </label>
+                    <input type="text" name="designation" class="form-control" disabled>
+                  </div>
+
+                  <div class="mb-3 col-md-6" *ngIf="ds">
+                    <label>Designation du code de l'acte </label>
+                    <input type="text" ngModel="{{ ds.designation }}" name="designation" class="form-control" disabled>
+                  </div>
+
+                </div>
+                  <div class="row border border-3 rounded-3 m-1">
+                    <div class="row" *ngIf="!ds">
+
+                      <div class="mb-3 col-md-4">
+                        <label>Quantité de l'acte <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                          <input type="text" class="form-control" readonly
+                                 ngModel name="quantiteActeBS" >
+                          <div class="input-group-append"><span class="input-group-text">Unité</span></div>
+                        </div>
+                      </div>
+
+
+                      <div class="mb-3 col-md-4">
+                        <label>Montant de l'acte <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                          <input type="text" ngModel="{{ 0.0 }}" name="montantActeBS"
+                                 class="form-control" readonly required>
+                          <div class="input-group-append"><span class="input-group-text">DT</span></div>
+                        </div>
+                      </div>
+
+
+
+                      <div class="mb-3 col-md-4">
+                        <label>Montant théorique </label>
+                        <div class="input-group">
+                          <input type="text" ngModel="{{ 0.0 }}"
+                                 name="montantTheoriqueActeBS" class="form-control" readonly>
+                          <span class="input-group-text">DT</span>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <div class="row" *ngIf="ds">
+
+                      <ng-container *ngIf="!selectedActeBS">
+                      <div class="mb-3 col-md-4">
+                        <label>Quantité de l'acte <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                          <input type="text" class="form-control"
+                                 ngModel name="quantiteActeBS" required
+                                 pattern="^(([1-9]{1}[0-9]*)||([0]{1}))$" autocomplete='off'
+                                 #quantiteActeBS="ngModel" [class.is-invalid]="quantiteActeBS.invalid && quantiteActeBS.touched"
+                                 [disabled]="!selectedrow2 || ds.mode == 'Taux'|| ds.mode == 'Valeur' || !acteMedVerif" (keyup)="setMontTh(ActeBS)"
+                                 (focus)="setMontTh(ActeBS)" aria-label="Somme arrondie">
+                          <div class="input-group-append"><span class="input-group-text">Unité</span></div>
+                        </div>
+                        <ng-container *ngIf="quantiteActeBS.errors && (quantiteActeBS.invalid && quantiteActeBS.touched)">
+                          <small class="text-danger" *ngIf="quantiteActeBS.errors?.['required']" >Ce champ est obligatoire!</small>
+                          <small class="text-danger" *ngIf="quantiteActeBS.errors?.['pattern']" >Ce champ est invalide</small>
+                        </ng-container>
+                      </div>
+
+
+                      <div class="mb-3 col-md-4">
+                        <label>Montant de l'acte <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                          <input type="text" ngModel="{{ 0.0 }}" name="montantActeBS" class="form-control" required autocomplete='off'
+                                 pattern="^(([1-9][0-9]*[.][0-9]{1,3})|([0-9])|([1-9][0-9]*)|([0-9][.][0-9]{1,3}))$"  #montantActeBS="ngModel"
+                                 [class.is-invalid]="montantActeBS.invalid && montantActeBS.touched"
+                                 [disabled]="!selectedrow2||!acteMedVerif" (keyup)="setMontTh(ActeBS)" (focus)="setMontTh(ActeBS)">
+                          <div class="input-group-append"><span class="input-group-text">DT</span></div>
+                        </div>
+                        <ng-container *ngIf="montantActeBS.errors && (montantActeBS.invalid && montantActeBS.touched)">
+                          <small class="text-danger" *ngIf="montantActeBS.errors?.['required']" >Ce champ est obligatoire!</small>
+                          <small class="text-danger" *ngIf="montantActeBS.errors?.['pattern']" >Ce champ est invalide</small>
+                        </ng-container>
+                      </div>
+
+
+                      <div class="mb-3 col-md-4" *ngIf="(!montantActeBS.errors) && (!quantiteActeBS.errors)">
+                        <label>Montant théorique </label>
+                        <div class="input-group">
+                          <input type="text" ngModel="{{montantTh}}" name="montantTheoriqueActeBS"
+                                 #montantTheoriqueActeBS="ngModel"
+                                 class="form-control" readonly>
+                          <span class="input-group-text">DT</span>
+                        </div>
+                      </div>
+
+                      <div class="mb-3 col-md-4" *ngIf="(montantActeBS.errors) || (quantiteActeBS.errors)">
+                        <label>Montant théorique </label>
+                        <div class="input-group">
+                          <input type="text" ngModel="{{0.0}}" name="montantTheoriqueActeBS"
+                                 #montantTheoriqueActeBS="ngModel"
+                                 class="form-control" readonly>
+                          <span class="input-group-text">DT</span>
+                        </div>
+                      </div></ng-container>
+
+                      <ng-container *ngIf="selectedActeBS">
+                      <div class="mb-3 col-md-4">
+                        <label>Quantité de l'acte <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                          <input type="text" class="form-control"
+                                 ngModel="{{selectedActeBS.quantiteActeBS}}" name="quantiteActeBS"
+                                 required pattern="^(([1-9]{1}[0-9]*)||([0]{1}))$"
+                                 autocomplete='off'
+                                 #quantiteActeBS="ngModel" [class.is-invalid]="quantiteActeBS.invalid && quantiteActeBS.touched"
+                                 [disabled]="!selectedrow2||ds.mode=='Taux'|| ds.mode == 'Valeur' ||!acteMedVerif" (keyup)="setMontTh(ActeBS)"
+                                 aria-label="Somme arrondie">
+                          <div class="input-group-append"><span class="input-group-text">Unité</span></div>
+                        </div>
+                        <div *ngIf="quantiteActeBS.errors && (quantiteActeBS.invalid && quantiteActeBS.touched)">
+                          <small class="text-danger" *ngIf="quantiteActeBS.errors?.['required']" >Ce champ est obligatoire!</small>
+                          <small class="text-danger" *ngIf="quantiteActeBS.errors?.['pattern']" >Ce champ est invalide</small>
+                        </div>
+                      </div>
+
+                      <div class="mb-3 col-md-4">
+                        <label>Montant de l'acte <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                          <input type="text" ngModel="{{selectedActeBS.montantActeBS}}" name="montantActeBS" class="form-control"
+                                 required autocomplete='off'
+                                 pattern="^(([1-9][0-9]*[.][0-9]{1,3})|([0-9])|([1-9][0-9]*)|([0-9][.][0-9]{1,3}))$"
+                                 #montantActeBS="ngModel" [class.is-invalid]="montantActeBS.invalid && montantActeBS.touched"
+                                 [disabled]="!selectedrow2||!acteMedVerif" (keyup)="setMontTh(ActeBS)">
+                          <div class="input-group-append"><span class="input-group-text">DT</span></div>
+                        </div>
+                        <div *ngIf="montantActeBS.errors && (montantActeBS.invalid && montantActeBS.touched)">
+                          <small class="text-danger" *ngIf="montantActeBS.errors?.['required']" >Ce champ est obligatoire!</small>
+                          <small class="text-danger" *ngIf="montantActeBS.errors?.['pattern']" >Ce champ est invalide</small>
+                        </div>
+                      </div>
+
+                      <div class="mb-3 col-md-4" *ngIf="(!montantActeBS.errors) && (!quantiteActeBS.errors)">
+                        <label>Montant théorique </label>
+                        <div class="input-group">
+                          <input type="text" ngModel="{{montantTh}}" name="montantTheoriqueActeBS"
+                                 #montantTheoriqueActeBS="ngModel"
+                                 class="form-control" readonly>
+                          <span class="input-group-text">DT</span>
+                        </div>
+                      </div>
+
+                      <div class="mb-3 col-md-4" *ngIf="(montantActeBS.errors) || (quantiteActeBS.errors)">
+                        <label>Montant théorique </label>
+                        <div class="input-group">
+                          <input type="text" ngModel="{{0.0}}" name="montantTheoriqueActeBS"
+                                 #montantTheoriqueActeBS="ngModel"
+                                 class="form-control" readonly>
+                          <span class="input-group-text">DT</span>
+                        </div>
+                      </div></ng-container>
+                    </div>
+                  </div>
+                  <div class="row border border-3 rounded-3 m-1">
+                    <div class="mb-3 col-md-6">
+                      <label>Date de l'acte par bulletin de soin <span class="text-danger">*</span></label>
+                      <ng-container *ngIf="!selectedActeBS">
+                      <input type="text" ngModel  name="dateActeBS" class="form-control"
+                             placeholder="YYYY-MM-DD"
+                             onfocus="(this.type='date')"
+                             onblur="(this.type='text')" autocomplete='off'
+                             #dateActeBS="ngModel" [class.is-invalid]="dateActeBS.invalid && dateActeBS.touched" required
+                             [disabled]="!selectedrow2">
+                      <small class="text-danger"
+                             *ngIf="selectedRowBorEnv && validateDatesActeBS(dateActeBS.value,selectedRowBorEnv.dateFin)==false && dateActeBS.value">
+                        La date de l'acte par bulletin de soin doit etre inférieur à la date de fin de " {{selectedRowBorEnv.nom}} ".
+                      </small>
+                      <small class="text-danger"
+                             *ngIf="selectedRowBorEnv && validateDatesActeBSStart(dateActeBS.value,selectedRowBorEnv.dateDebut)==false && dateActeBS.value">
+                        La date de l'acte par bulletin de soin doit etre supérieur à la date de début de " {{selectedRowBorEnv.nom}} ".
+                      </small>
+                      <small class="text-danger"
+                             *ngIf="selectedRowBorEnv && selectedrow2 && validateDatesActeBSwithBullStart(dateActeBS.value,selectedrow2.datebs)==false && dateActeBS.value && validateDatesActeBSStart(dateActeBS.value,selectedRowBorEnv.dateDebut)==true && validateDatesActeBS(dateActeBS.value,selectedRowBorEnv.dateFin)==true">
+                        La date de l'acte par bulletin de soin doit etre supérieur à la date de bulletin de soin.
+                      </small>
+                      <small class="text-danger" *ngIf="dateActeBS.touched && dateActeBS.errors?.['required']">
+                        Ce champ est obligatoire!</small>
+                      </ng-container>
+                      <ng-container *ngIf="selectedActeBS">
+                      <input type="text" ngModel="{{selectedActeBS.dateActeBS}}"  name="dateActeBS" class="form-control"
+                             placeholder="YYYY-MM-DD"
+                             onfocus="(this.type='date')"
+                             onblur="(this.type='text')"
+                             #dateActeBS="ngModel" [class.is-invalid]="dateActeBS.invalid && dateActeBS.touched" required
+                             [disabled]="!selectedrow2">
+                      <small class="text-danger"
+                             *ngIf="selectedRowBorEnv && validateDatesActeBS(dateActeBS.value,selectedRowBorEnv.dateFin)==false && dateActeBS.value">
+                        La date de l'acte par bulletin de soin doit etre inférieur à la date de fin de " {{selectedRowBorEnv.nom}} ".
+                      </small>
+                      <small class="text-danger"
+                             *ngIf="selectedRowBorEnv && validateDatesActeBSStart(dateActeBS.value,selectedRowBorEnv.dateDebut)==false && dateActeBS.value">
+                        La date de l'acte par bulletin de soin doit etre supérieur à la date de début de " {{selectedRowBorEnv.nom}} ".
+                      </small>
+                      <small class="text-danger"
+                             *ngIf="selectedRowBorEnv && selectedrow2 && validateDatesActeBSwithBullStart(dateActeBS.value,selectedrow2.datebs)==false && dateActeBS.value && validateDatesActeBSStart(dateActeBS.value,selectedRowBorEnv.dateDebut)==true && validateDatesActeBS(dateActeBS.value,selectedRowBorEnv.dateFin)==true">
+                        la date de l'acte par bulletin de soin doit etre supérieur à la date de bulletin de soin
+                      </small>
+                      <small class="text-danger" *ngIf="dateActeBS.touched && dateActeBS.errors?.['required']">
+                        Ce champ est obligatoire!</small>
+                      </ng-container>
+                    </div>
+
+
+                    <ng-container *ngIf="!selectedActeBS && ActeBS.form.controls['matMedcinActeBS']">
+                    <div class="mb-3 col-md-6" *ngIf="phPra == false">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label> <br><br>
+                      <mat-radio-group ngModel name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" color="primary">Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" color="primary">Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col-md-6" *ngIf="phPra == true && pharmacirInActeBS == true && !ActeBS.form.controls['matMedcinActeBS'].value">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label><br>
+                      <small class="text-info">Cette pharmacie est conventionnée.</small>
+                      <br><br>
+                      <mat-radio-group ngModel name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" checked="false"  color="primary" disabled>Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" color="primary">Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col-md-6" *ngIf="phPra == true && pharmacirInActeBS == true && ActeBS.form.controls['matMedcinActeBS'].value">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label>
+                      <br><br>
+                      <mat-radio-group ngModel name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" checked="false"  color="primary" disabled>Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" color="primary" disabled>Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col-md-6" *ngIf="phPra == true && pharmacirInActeBS == false && !ActeBS.form.controls['matMedcinActeBS'].value">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label><br>
+                      <small class="text-info">Cette pharmacie est non conventionnée.</small>
+                      <br><br>
+                      <mat-radio-group ngModel name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" color="primary">Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" checked="false" color="primary" disabled>Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col-md-6" *ngIf="phPra == true && pharmacirInActeBS == false && ActeBS.form.controls['matMedcinActeBS'].value">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label>
+                      <br><br>
+                      <mat-radio-group ngModel name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" color="primary" disabled>Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" checked="false" color="primary" disabled>Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+                    </ng-container>
+                    <ng-container *ngIf="selectedActeBS && ActeBS.form.controls['matMedcinActeBS']">
+
+
+                    <div class="mb-3 col-md-6" *ngIf="phPra == false &&
+                   ((phari == matPharmacieActeBS.value && selectedActeBS.matPraticienActeBS == null
+                   && medi == null) ||
+                    (medi == ActeBS.form.controls['matMedcinActeBS'].value && phari == null &&
+                    selectedActeBS.matPraticienActeBS == null) ||
+                    (selectedActeBS.matPraticienActeBS == matPraticienActeBS.value && phari == null
+                    && medi == null))">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label> <br><br>
+                      <mat-radio-group ngModel="{{ selectedActeBS.beneficiaire }}" name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" color="primary">Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" color="primary">Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col-md-6" *ngIf="phPra == false &&
+                   ((phari != matPharmacieActeBS.value && selectedActeBS.matPraticienActeBS == null
+                   && medi == null) ||
+                    (medi != ActeBS.form.controls['matMedcinActeBS'].value && phari == null &&
+                    selectedActeBS.matPraticienActeBS == null) ||
+                    (selectedActeBS.matPraticienActeBS != matPraticienActeBS.value && phari == null
+                    && medi == null))">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label> <br><br>
+                      <mat-radio-group ngModel name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" color="primary">Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" color="primary">Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col-md-6" *ngIf="phPra == true && pharmacirInActeBS == true &&
+                    ((phari == matPharmacieActeBS.value && selectedActeBS.matPraticienActeBS == null
+                    && medi == null) ||
+                    (medi == ActeBS.form.controls['matMedcinActeBS'].value && phari == null &&
+                    selectedActeBS.matPraticienActeBS == null) ||
+                    (selectedActeBS.matPraticienActeBS == matPraticienActeBS.value && phari == null
+                    && medi == null))">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label><br>
+                      <small class="text-info">Cette pharmacie est conventionnée.</small>
+                      <br><br>
+                      <mat-radio-group ngModel="{{ selectedActeBS.beneficiaire }}" name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" checked="false"  color="primary" disabled>Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" color="primary">Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col-md-6" *ngIf="phPra == true && pharmacirInActeBS == true &&
+                    ((phari != matPharmacieActeBS.value && selectedActeBS.matPraticienActeBS ==null
+                    && medi == null) ||
+                    (medi != ActeBS.form.controls['matMedcinActeBS'].value && phari == null &&
+                    selectedActeBS.matPraticienActeBS == null) ||
+                    (selectedActeBS.matPraticienActeBS != matPraticienActeBS.value && phari == null
+                    && medi == null)) && !ActeBS.form.controls['matMedcinActeBS'].value">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label><br>
+                      <small  class="text-info">Cette pharmacie est conventionnée.</small>
+                      <br><br>
+                      <mat-radio-group ngModel name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" checked="false"  color="primary" disabled>Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" color="primary">Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col-md-6" *ngIf="phPra == true && pharmacirInActeBS == true &&
+                    ((phari != matPharmacieActeBS.value && selectedActeBS.matPraticienActeBS ==null
+                    && medi == null) ||
+                    (medi != ActeBS.form.controls['matMedcinActeBS'].value && phari == null &&
+                    selectedActeBS.matPraticienActeBS == null) ||
+                    (selectedActeBS.matPraticienActeBS != matPraticienActeBS.value && phari == null
+                    && medi == null)) && ActeBS.form.controls['matMedcinActeBS'].value">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label>
+                      <br><br>
+                      <mat-radio-group ngModel name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" checked="false"  color="primary" disabled>Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" color="primary" disabled>Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col-md-6" *ngIf="(phPra == true && pharmacirInActeBS == false) &&
+                    ((phari == matPharmacieActeBS.value && selectedActeBS.matPraticienActeBS == null
+                    && medi == null) ||
+                    (medi == ActeBS.form.controls['matMedcinActeBS'].value && phari == null &&
+                    selectedActeBS.matPraticienActeBS == null) ||
+                    (selectedActeBS.matPraticienActeBS == matPraticienActeBS.value && phari == null
+                    && medi == null))">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label><br>
+                      <small  class="text-info">Cette pharmacie est non conventionnée.</small>
+                      <br><br>
+                      <mat-radio-group ngModel="{{ selectedActeBS.beneficiaire }}" name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" color="primary">Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" checked="false" color="primary" disabled>Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col-md-6" *ngIf="(phPra == true && pharmacirInActeBS == false) &&
+                    ((phari != matPharmacieActeBS.value && selectedActeBS.matPraticienActeBS ==null
+                    && medi == null) ||
+                    (medi != ActeBS.form.controls['matMedcinActeBS'].value && phari == null &&
+                    selectedActeBS.matPraticienActeBS == null) ||
+                    (selectedActeBS.matPraticienActeBS != matPraticienActeBS.value && phari == null
+                    && medi == null)) && !ActeBS.form.controls['matMedcinActeBS'].value">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label><br>
+                      <small  class="text-info">Cette pharmacie est non conventionnée.</small>
+                      <br><br>
+                      <mat-radio-group ngModel name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" color="primary">Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" checked="false" color="primary" disabled>Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col-md-6" *ngIf="(phPra == true && pharmacirInActeBS == false) &&
+                    ((phari != matPharmacieActeBS.value && selectedActeBS.matPraticienActeBS ==null
+                    && medi == null) ||
+                    (medi != ActeBS.form.controls['matMedcinActeBS'].value && phari == null &&
+                    selectedActeBS.matPraticienActeBS == null) ||
+                    (selectedActeBS.matPraticienActeBS != matPraticienActeBS.value && phari == null
+                    && medi == null)) && ActeBS.form.controls['matMedcinActeBS'].value">
+                      <label>Choisir un bénéficiaire <span class="text-danger">*</span></label>
+                      <br><br>
+                      <mat-radio-group ngModel name="beneficiaire" #beneficiaire="ngModel" required
+                                       aria-label="Select an option"
+                                       [disabled]="!selectedrow2">
+                        <mat-radio-button  value="Employé" color="primary" disabled>Employé</mat-radio-button><span style="padding-left: 2em"></span>
+                        <mat-radio-button value="Auteur de l'acte" checked="false" color="primary" disabled>Auteur de l'acte</mat-radio-button>
+                      </mat-radio-group>
+                      <div *ngIf="beneficiaire.errors && (beneficiaire.invalid && beneficiaire.touched)">
+                        <small class="text-danger" *ngIf="beneficiaire.errors?.['required']" >Ce champ est obligatoire!</small>
+                      </div>
+                    </div>
+                    </ng-container>
+                  </div>
+
+            </div>
+
+                <div class="col bordleft mt-2">
+                <div class="row border border-3 rounded-3 m-1">
+
+                  <div class="mb-3 col-md-4">
+                    <label>Matriculle du médecin <span class="text-danger">*</span></label>
+
+                    <ng-container *ngIf="!selectedActeBS">
+                    <input type="text" ngModel
+                           name="matMedcinActeBS"
+                           class="form-control" autocomplete='off' required pattern="^(MED)[0-9]{1,20}$"
+                           #matMedcinActeBS="ngModel" [class.is-invalid]="matMedcinActeBS.invalid && matMedcinActeBS.touched"
+                           (focus)="getMedcinNomByMatriculeMed(matMedcinActeBS.value)
+                            || getMedcinPrenomByMatriculeMed(matMedcinActeBS.value) ||
+                             getMedcinTypeByMatriculeMed(matMedcinActeBS.value) || ExistMed(matMedcinActeBS.value)"
+                           (keyup)="getMedcinNomByMatriculeMed(matMedcinActeBS.value)
+                             || getMedcinPrenomByMatriculeMed(matMedcinActeBS.value) ||
+                              getMedcinTypeByMatriculeMed(matMedcinActeBS.value) || ExistMed(matMedcinActeBS.value)"
+                           (change)="getMedcinNomByMatriculeMed(matMedcinActeBS.value)
+                             && getMedcinPrenomByMatriculeMed(matMedcinActeBS.value) &&
+                              getMedcinTypeByMatriculeMed(matMedcinActeBS.value) && ExistMed(matMedcinActeBS.value)"
+                           (keyup) = "ExistPharInActeBS(matMedcinActeBS.value)"
+                           (change)="ExistPharInActeBS(matMedcinActeBS.value)"
+                           [disabled]="(!selectedrow2) || (matPharmacieActeBS.value || matPharmacieActeBS.valid)
+                                      || (matPraticienActeBS.value || matPraticienActeBS.valid)"
+                           list="list-med">
+
+                    <datalist id="list-med">
+                      <option *ngFor="let listemed of opTestMed " [value]="listemed.matriculeMedecin">
+                        {{ listemed.matriculeMedecin + ' ' + listemed.nom + ' '  + listemed.prenom }}
+                      </option>
+                    </datalist>
+                    <div *ngIf="matMedcinActeBS.errors && (matMedcinActeBS.invalid && matMedcinActeBS.touched)">
+                      <small class="text-danger" *ngIf="matMedcinActeBS.errors?.['required']" >Ce champ est obligatoire!</small>
+                      <small class="text-danger" *ngIf="matMedcinActeBS.errors?.['pattern']" >Ce champ est invalide</small>
+                    </div>
+                    <small *ngIf="medVerif == false && matMedcinActeBS.value && !matMedcinActeBS.errors && matMedcinActeBS.touched"
+                           class="text-danger">{{ ExistMedMatMed }}</small>
+                    </ng-container>
+
+                    <ng-container *ngIf="selectedActeBS">
+                    <input type="text" ngModel="{{medi}}" name="matMedcinActeBS" class="form-control" required
+                           #matMedcinActeBS="ngModel" pattern="^(MED)[0-9]{1,20}$" autocomplete="off"
+                           [class.is-invalid]="matMedcinActeBS.invalid && matMedcinActeBS.touched"
+                           (focus)="getMedcinNomByMatriculeMed(matMedcinActeBS.value)
+                            || getMedcinPrenomByMatriculeMed(matMedcinActeBS.value) ||
+                             getMedcinTypeByMatriculeMed(matMedcinActeBS.value) || ExistMed(matMedcinActeBS.value)"
+                           (keyup)="getMedcinNomByMatriculeMed(matMedcinActeBS.value)
+                             || getMedcinPrenomByMatriculeMed(matMedcinActeBS.value) ||
+                              getMedcinTypeByMatriculeMed(matMedcinActeBS.value) || ExistMed(matMedcinActeBS.value)"
+                           (change)="getMedcinNomByMatriculeMed(matMedcinActeBS.value)
+                             && getMedcinPrenomByMatriculeMed(matMedcinActeBS.value) &&
+                              getMedcinTypeByMatriculeMed(matMedcinActeBS.value) && ExistMed(matMedcinActeBS.value)"
+                           (keyup) = "ExistPharInActeBS(matMedcinActeBS.value)"
+                           (change)="ExistPharInActeBS(matMedcinActeBS.value)"
+                           [disabled]="(!selectedrow2) || (matPharmacieActeBS.value || matPharmacieActeBS.valid)
+                                      || (matPraticienActeBS.value || matPraticienActeBS.valid)"
+                           list="list-med2">
+
+                    <datalist id="list-med2">
+                      <option *ngFor="let listemed of opTestMed " [value]="listemed.matriculeMedecin">
+                        {{ listemed.matriculeMedecin + ' ' + listemed.nom + ' '  + listemed.prenom }}
+                      </option>
+                    </datalist>
+                    <div *ngIf="matMedcinActeBS.errors && (matMedcinActeBS.invalid && matMedcinActeBS.touched)">
+                      <small class="text-danger" *ngIf="matMedcinActeBS.errors?.['required']" >Ce champ est obligatoire!</small>
+                      <small class="text-danger" *ngIf="matMedcinActeBS.errors?.['pattern']" >Ce champ est invalide</small>
+                    </div>
+                    <small *ngIf="medVerif == false && matMedcinActeBS.value && !matMedcinActeBS.errors && matMedcinActeBS.touched"
+                           class="text-danger">{{ ExistMedMatMed }}</small>
+                    </ng-container>
+
+                  </div>
+
+                  <ng-container *ngIf="!selectedActeBS && ActeBS.form.controls['matMedcinActeBS']">
+                  <div class="mb-3 col-md-4" *ngIf="exiMedBS==true && medVerif==true && ActeBS.form.controls['matMedcinActeBS'].value">
+                    <label>Nom et prénom du médecin </label>
+                    <input type="text" ngModel="{{ opMedFull + ' ' + opMedPrenom }}" name="nomMedecin" class="form-control" disabled>
+                  </div>
+                  <div class="mb-3 col-md-4" *ngIf="exiMedBS==true && medVerif==true && ActeBS.form.controls['matMedcinActeBS'].value">
+                    <label>Type du médecin </label>
+                    <input type="text" ngModel="{{ opMedType }}" name="typeMedecin" class="form-control" disabled>
+                  </div>
+
+                  <div class="mb-3 col-md-4" *ngIf="exiMedBS==false || medVerif==false || !ActeBS.form.controls['matMedcinActeBS'].value">
+                    <label>Nom et prénom du médecin </label>
+                    <input type="text" ngModel name="nomMedecin" class="form-control" disabled>
+                  </div>
+                  <div class="mb-3 col-md-4" *ngIf="exiMedBS==false || medVerif==false || !ActeBS.form.controls['matMedcinActeBS'].value">
+                    <label>Type du médecin </label>
+                    <input type="text" ngModel name="typeMedecin" class="form-control" disabled>
+                  </div></ng-container>
+
+                  <ng-container *ngIf="selectedActeBS && ActeBS.form.controls['matMedcinActeBS']">
+                  <div class="mb-3 col-md-4" *ngIf="exiMedBS==true && medVerif==true && ActeBS.form.controls['matMedcinActeBS'].value">
+                    <label>Nom et prénom du médecin </label>
+                    <input type="text" ngModel="{{ opMedFull + ' ' + opMedPrenom }}" name="nomMedecin" class="form-control" disabled>
+                  </div>
+                  <div class="mb-3 col-md-4" *ngIf="exiMedBS==true && medVerif==true && ActeBS.form.controls['matMedcinActeBS'].value">
+                    <label>Type du médecin </label>
+                    <input type="text" ngModel="{{ opMedType }}" name="typeMedecin" class="form-control" disabled>
+                  </div>
+
+                  <div class="mb-3 col-md-4" *ngIf="exiMedBS==false || medVerif==false || !ActeBS.form.controls['matMedcinActeBS'].value">
+                    <label>Nom et prénom du médecin </label>
+                    <input type="text" ngModel name="nomMedecin" class="form-control" disabled>
+                  </div>
+                  <div class="mb-3 col-md-4" *ngIf="exiMedBS==false || medVerif==false || !ActeBS.form.controls['matMedcinActeBS'].value">
+                    <label>Type du médecin </label>
+                    <input type="text" ngModel name="typeMedecin" class="form-control" disabled>
+                  </div></ng-container>
+
+                </div>
+
+
+                <div class="row border border-3 rounded-3 m-1">
+                  <div class="mb-3 col-md-6">
+                    <label>Matriculle du pharmacie <span class="text-danger">*</span></label>
+
+                    <ng-container *ngIf="!selectedActeBS && ActeBS.form.controls['matMedcinActeBS']">
+                    <input type="text" ngModel name="matPharmacieActeBS" class="form-control" required
+                           #matPharmacieActeBS="ngModel" autocomplete='off' pattern="^(PHAR)[0-9]{1,20}$"
+                           (focus)="getPharmacieByMatriculePhar(matPharmacieActeBS.value)
+                            || ExistPhar(matPharmacieActeBS.value)"
+                           (keyup)="getPharmacieByMatriculePhar(matPharmacieActeBS.value)
+                            || ExistPhar(matPharmacieActeBS.value)"
+                           (change)="getPharmacieByMatriculePhar(matPharmacieActeBS.value)
+                            && ExistPhar(matPharmacieActeBS.value)"
+                           (keyup) = "ExistPharInActeBS(matPharmacieActeBS.value)"
+                           (change)="ExistPharInActeBS(matPharmacieActeBS.value)"
+                           list="listephar"
+                           [class.is-invalid]="matPharmacieActeBS.invalid && matPharmacieActeBS.touched"
+                           [disabled]="(!selectedrow2) ||(ActeBS.form.controls['matMedcinActeBS'].value || ActeBS.form.controls['matMedcinActeBS'].valid) ||
+                                        (matPraticienActeBS.value || matPraticienActeBS.valid)">
+                    <datalist id="listephar">
+                      <option *ngFor="let listephar of opTestPhar" [value]="listephar.matriculePharmacie">
+                        {{ listephar.matriculePharmacie + ' ' + listephar.nom}}
+                      </option>
+                    </datalist>
+                    <div *ngIf="matPharmacieActeBS.errors && (matPharmacieActeBS.invalid && matPharmacieActeBS.touched)">
+                      <small class="text-danger" *ngIf="matPharmacieActeBS.errors?.['required']" >Ce champ est obligatoire!</small>
+                      <small class="text-danger" *ngIf="matPharmacieActeBS.errors?.['pattern']" >Ce champ est invalide</small>
+                    </div>
+                    <small *ngIf="pharVerif == false && matPharmacieActeBS.value && !matPharmacieActeBS.errors && matPharmacieActeBS.touched" class="text-danger">{{ ExistPharMatPhar }}</small>
+                    </ng-container>
+
+                    <ng-container *ngIf="selectedActeBS">
+                    <input type="text" ngModel="{{phari}}" name="matPharmacieActeBS" class="form-control" required
+                           #matPharmacieActeBS="ngModel" autocomplete='off' pattern="^(PHAR)[0-9]{1,20}$"
+                           [class.is-invalid]="matPharmacieActeBS.invalid && matPharmacieActeBS.touched"
+                           (focus)="getPharmacieByMatriculePhar(matPharmacieActeBS.value)
+                            || ExistPhar(matPharmacieActeBS.value)"
+                           (keyup)="getPharmacieByMatriculePhar(matPharmacieActeBS.value)
+                            || ExistPhar(matPharmacieActeBS.value)"
+                           (change)="getPharmacieByMatriculePhar(matPharmacieActeBS.value)
+                            && ExistPhar(matPharmacieActeBS.value)"
+                           (keyup) = "ExistPharInActeBS(matPharmacieActeBS.value)"
+                           (change)="ExistPharInActeBS(matPharmacieActeBS.value)"
+                           list="listephar2"
+                           [disabled]="(!selectedrow2) ||(ActeBS.form.controls['matMedcinActeBS'].value || ActeBS.form.controls['matMedcinActeBS'].valid) ||
+                                        (matPraticienActeBS.value || matPraticienActeBS.valid)">
+                    <datalist id="listephar2">
+                      <option *ngFor="let listephar of opTestPhar" [value]="listephar.matriculePharmacie">
+                        {{ listephar.matriculePharmacie + ' ' + listephar.nom}}
+                      </option>
+                    </datalist>
+                    <div *ngIf="matPharmacieActeBS.errors && (matPharmacieActeBS.invalid && matPharmacieActeBS.touched)">
+                      <small class="text-danger" *ngIf="matPharmacieActeBS.errors?.['required']" >Ce champ est obligatoire!</small>
+                      <small class="text-danger" *ngIf="matPharmacieActeBS.errors?.['pattern']" >Ce champ est invalide</small>
+                    </div>
+                    <small *ngIf="pharVerif == false && matPharmacieActeBS.value && !matPharmacieActeBS.errors && matPharmacieActeBS.touched" class="text-danger">{{ ExistPharMatPhar }}</small>
+                    </ng-container>
+
+                  </div>
+
+                  <ng-container *ngIf="!selectedActeBS">
+                  <div class="mb-3 col-md-6" *ngIf="pharVerif==true && exiPharBS==true && matPharmacieActeBS.value">
+                    <label>Nom du pharmacie </label>
+                    <input type="text" ngModel="{{ opPharNom }}" name="nomPharmacie" class="form-control" disabled>
+                  </div>
+
+                  <div class="mb-3 col-md-6" *ngIf="pharVerif==false || exiPharBS==false || !matPharmacieActeBS.value">
+                    <label>Nom du pharmacie </label>
+                    <input type="text" ngModel name="nomPharmacie" class="form-control" disabled>
+
+                  </div></ng-container>
+                  <ng-container *ngIf="selectedActeBS">
+                  <div class="mb-3 col-md-6" *ngIf="pharVerif==true && exiPharBS==true && matPharmacieActeBS.value">
+                    <label>Nom du pharmacie </label>
+                    <input type="text" ngModel="{{ opPharNom }}" name="nomPharmacie" class="form-control" disabled>
+                  </div>
+
+                  <div class="mb-3 col-md-6" *ngIf="pharVerif==false || exiPharBS==false || !matPharmacieActeBS.value">
+                    <label>Nom du pharmacie </label>
+                    <input type="text" ngModel name="nomPharmacie" class="form-control" disabled>
+
+                  </div></ng-container>
+                </div>
+
+                <div class="row border border-3 rounded-3 m-1">
+                  <div class="mb-3 col-md-6">
+                    <label>Matriculle du praticien <span class="text-danger">*</span></label>
+
+                    <ng-container *ngIf="!selectedActeBS">
+                    <input type="text" ngModel name="matPraticienActeBS" class="form-control" required
+                           #matPraticienActeBS="ngModel" autocomplete='off'
+                           pattern="^((PHAR)|(MED)|(PRA))[0-9]{1,20}$"
+                           [class.is-invalid]="matPraticienActeBS.invalid && matPraticienActeBS.touched"
+                           (focus) ="getFullAll(matPraticienActeBS.value)"
+                           (keyup) ="getFullAll(matPraticienActeBS.value) || ExistPharInActeBS(matPraticienActeBS.value)"
+                           (change)="getFullAll(matPraticienActeBS.value) && ExistPharInActeBS(matPraticienActeBS.value)"
+                           list="listePra"
+                           [disabled]="(!selectedrow2) || (ActeBS.form.controls['matMedcinActeBS'].value || ActeBS.form.controls['matMedcinActeBS'].valid) ||
+                                       (matPharmacieActeBS.value || matPharmacieActeBS.valid)">
+                    <datalist id="listePra">
+                      <option *ngFor="let listeMed of opTestMed"
+                              [value]="listeMed.matriculeMedecin">
+                        {{ listeMed.matriculeMedecin + ' ' + listeMed.nom + ' ' + listeMed.prenom }}
+                      </option>
+                      <option *ngFor="let listePha of opTestPhar" [value]="listePha.matriculePharmacie">
+                        {{ listePha.matriculePharmacie + ' ' + listePha.nom }}
+                      </option>
+                      <option *ngFor="let listePra of opTestPra" [value]="listePra.matriculePraticien">
+                        {{ listePra.matriculePraticien + ' ' + listePra.nom + ' ' + listePra.prenom }}
+                      </option>
+                    </datalist>
+
+                    <small *ngIf="!verif.value && matPraticienActeBS.value && !matPraticienActeBS.errors && matPraticienActeBS.touched"
+                           class="text-danger">{{ ExistAll }}</small>
+
+                    <ng-container *ngIf="matPraticienActeBS.errors && (matPraticienActeBS.invalid && matPraticienActeBS.touched)">
+                      <small class="text-danger" *ngIf="matPraticienActeBS.errors?.['required']" >Ce champ est obligatoire!</small>
+                      <small class="text-danger" *ngIf="matPraticienActeBS.errors?.['pattern']" >Ce champ est invalide</small>
+                    </ng-container></ng-container>
+
+                    <ng-container *ngIf="selectedActeBS">
+                    <input type="text" ngModel="{{selectedActeBS.matPraticienActeBS}}" name="matPraticienActeBS"
+                           class="form-control" pattern="^((PHAR)|(MED)|(PRA))[0-9]{1,20}$" required
+                           #matPraticienActeBS="ngModel" autocomplete='off'
+                           [class.is-invalid]="matPraticienActeBS.invalid && matPraticienActeBS.touched"
+                           (focus) ="getFullAll(matPraticienActeBS.value)"
+                           (keyup) ="getFullAll(matPraticienActeBS.value) || ExistPharInActeBS(matPraticienActeBS.value)"
+                           (change)="getFullAll(matPraticienActeBS.value) && ExistPharInActeBS(matPraticienActeBS.value)"
+                           list="listePra2"
+                           [disabled]="(!selectedrow2) || (ActeBS.form.controls['matMedcinActeBS'].value || ActeBS.form.controls['matMedcinActeBS'].valid) ||
+                                       (matPharmacieActeBS.value || matPharmacieActeBS.valid)">
+                    <datalist id="listePra2">
+                      <option *ngFor="let listeMed of opTestMed"
+                              [value]="listeMed.matriculeMedecin">
+                        {{ listeMed.matriculeMedecin + ' ' + listeMed.nom + ' ' + listeMed.prenom }}
+                      </option>
+                      <option *ngFor="let listePha of opTestPhar" [value]="listePha.matriculePharmacie">
+                        {{ listePha.matriculePharmacie + ' ' + listePha.nom }}
+                      </option>
+                      <option *ngFor="let listePra of opTestPra" [value]="listePra.matriculePraticien">
+                        {{ listePra.matriculePraticien + ' ' + listePra.nom + ' ' + listePra.prenom }}
+                      </option>
+                    </datalist>
+                    <div *ngIf="matPraticienActeBS.errors && (matPraticienActeBS.invalid && matPraticienActeBS.touched)">
+                      <small class="text-danger" *ngIf="matPraticienActeBS.errors?.['required']" >Ce champ est obligatoire!</small>
+                      <small class="text-danger" *ngIf="matPraticienActeBS.errors?.['pattern']" >Ce champ est invalide</small>
+                    </div>
+                    <small *ngIf="!verif.value && matPraticienActeBS.value && !matPraticienActeBS.errors && matPraticienActeBS.touched"
+                           class="text-danger">{{ ExistAll }}</small></ng-container>
+
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label>Nom et prénom du praticien </label>
+                    <input type="text" #verif ngModel="{{ fullAll }}"
+                           name="nomPraticien"
+                           class="form-control" disabled>
+                  </div>
+
+                </div>
+            </div>
+            </div>
+              <br>
+              <hr style="border-bottom: 2px solid ;width: 100%">
+              <div class="row">
+                <ng-container *ngIf="!selectedActeBS && matPharmacieActeBS">
+                <div class="col-md-12 mt-1">
+                  <span style="padding-left: 26%;"></span>
+                  <button style="width: 150px" class="btn ssss go" [disabled]="ActeBS.invalid || selectedActeBS || !verif.value || isValidDateActeBS==false || isValidDateActeBSS==false || acteMedVerif==false || isValidDateActeBSBull==false"
+                          *ngIf="!ActeBS.form.controls['matMedcinActeBS'].value && !matPharmacieActeBS.value && matPraticienActeBS.value && ActeBS.form.controls['codeActeBS'].value"
+                          data-bs-toggle="modal" data-bs-target="#exampleModalAddActeBS">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                    </svg>
+                    Ajouter</button>
+                  <!-- Modal -->
+                  <div class="modal fade" id="exampleModalAddActeBS" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h2 class="modal-title" id="exampleModalAddLabelActeBS">Addition</h2>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Voulez-vous vraiment ajouter cet acte par bulletin de soin ?
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                          <button type="button" class="btn yes" (click)="onaddActeBSPra(ActeBS,selectedrow2.id,ActeBS.form.controls['codeActeBS'].value,matPraticienActeBS.value,AgentForm,BSFormForSomme)" data-bs-dismiss="modal">Oui</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button style="width: 150px" class="btn ssss go" [disabled]="ActeBS.invalid || selectedActeBS || medVerif==false || isValidDateActeBS==false || isValidDateActeBSS==false || acteMedVerif==false || isValidDateActeBSBull==false"
+                          *ngIf="ActeBS.form.controls['codeActeBS'].value && ActeBS.form.controls['matMedcinActeBS'].value && !matPraticienActeBS.value && !matPharmacieActeBS.value"
+                          data-bs-toggle="modal" data-bs-target="#exampleModalAdd2ActeBS">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                    </svg>
+                    Ajouter</button>
+                  <!-- Modal -->
+                  <div class="modal fade" id="exampleModalAdd2ActeBS" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalAdd2LabelActeBS">Addition</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Voulez-vous vraiment ajouter cet acte par bulletin de soin ?
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                          <button type="button" class="btn wait" (click)="onaddActeBSMed(ActeBS,selectedrow2.id,ActeBS.form.controls['codeActeBS'].value,ActeBS.form.controls['matMedcinActeBS'].value,AgentForm,BSFormForSomme)" data-bs-dismiss="modal">Oui</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button style="width: 150px" class="btn ssss go" *ngIf="(!ActeBS.form.controls['codeActeBS'].value && !ActeBS.form.controls['matMedcinActeBS'].value && !matPraticienActeBS.value && !matPharmacieActeBS.value) ||
+                                                       (ActeBS.form.controls['codeActeBS'].value  && !ActeBS.form.controls['matMedcinActeBS'].value && !matPraticienActeBS.value && !matPharmacieActeBS.value) ||
+                                                      (ActeBS.form.controls['codeActeBS'].value && matPraticienActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value && matPharmacieActeBS.value) ||
+                                                       (ActeBS.form.controls['codeActeBS'].value && !ActeBS.form.controls['matMedcinActeBS'].value && matPraticienActeBS.value && matPharmacieActeBS.value) ||
+                                                        (ActeBS.form.controls['codeActeBS'].value && !matPraticienActeBS.value && matPharmacieActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value) ||
+                                                         (ActeBS.form.controls['codeActeBS'].value && !matPharmacieActeBS.value && matPraticienActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value) ||
+                                                        (!ActeBS.form.controls['codeActeBS'].value && matPraticienActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value && matPharmacieActeBS.value) ||
+                                                       (!ActeBS.form.controls['codeActeBS'].value && !ActeBS.form.controls['matMedcinActeBS'].value && matPraticienActeBS.value && matPharmacieActeBS.value) ||
+                                                        (!ActeBS.form.controls['codeActeBS'].value && !matPraticienActeBS.value && matPharmacieActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value) ||
+                                                         (!ActeBS.form.controls['codeActeBS'].value && !matPharmacieActeBS.value && matPraticienActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value) ||
+                                                       (!ActeBS.form.controls['codeActeBS'].value && !ActeBS.form.controls['matMedcinActeBS'].value && !matPraticienActeBS.value && matPharmacieActeBS.value) ||
+                                                        (!ActeBS.form.controls['codeActeBS'].value && !matPraticienActeBS.value && !matPharmacieActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value) ||
+                                                         (!ActeBS.form.controls['codeActeBS'].value && !matPharmacieActeBS.value && matPraticienActeBS.value && !ActeBS.form.controls['matMedcinActeBS'].value)"
+                          disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                    </svg>
+                    Ajouter</button>
+                  <button style="width: 150px" class="btn ssss go" [disabled]="ActeBS.invalid || selectedActeBS || pharVerif == false || isValidDateActeBS==false || isValidDateActeBSS==false || acteMedVerif==false || isValidDateActeBSBull==false"
+                          *ngIf="!ActeBS.form.controls['matMedcinActeBS'].value && !matPraticienActeBS.value && ActeBS.form.controls['codeActeBS'].value && matPharmacieActeBS.value"
+                          data-bs-toggle="modal" data-bs-target="#exampleModalAdd3ActeBS" >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                    </svg>
+                    Ajouter</button>
+                  <!-- Modal -->
+                  <div class="modal fade" id="exampleModalAdd3ActeBS" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h2 class="modal-title" id="exampleModalAdd3LabelActeBS">Addition</h2>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Voulez-vous vraiment ajouter cet acte par bulletin de soin ?
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                          <button type="button" class="btn yes" (click)="onaddActeBSPhar(ActeBS,selectedrow2.id,ActeBS.form.controls['codeActeBS'].value,matPharmacieActeBS.value,AgentForm,BSFormForSomme)" data-bs-dismiss="modal">Oui</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <span style="padding-left: 2em"></span>
+                  <button  style="width: 150px" class="btn ssss go" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                      <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+                    </svg>
+                    Modifier</button>
+                  <span style="padding-left: 2em"></span>
+                  <button class="btn ssee go" style="width: 150px" disabled >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                      <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                    </svg>
+                    Supprimer</button>
+                  <span style="padding-left: 2em"></span><button style="width: 150px" class="btn ssee" (click)="cancelClickActBS(ActeBS)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                    <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                  </svg>
+                  Réinitialiser</button>
+                </div></ng-container>
+
+
+                <ng-container *ngIf="selectedActeBS">
+                <div class="col-md-12 mt-1">
+                  <span style="padding-left: 26%;"></span>
+                  <button class="btn ssss go" style="width: 150px" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                    </svg>
+                    Ajouter</button>
+
+                  <span style="padding-left: 2em"></span>
+                  <button  style="width: 150px" class="btn ssss go" *ngIf="ActeBS.form.controls['matMedcinActeBS'].value && !matPharmacieActeBS.value && !matPraticienActeBS.value && ActeBS.form.controls['codeActeBS'].value"
+                           [disabled]="ActeBS.invalid || !selectedActeBS || medVerif==false || isValidDateActeBS==false || isValidDateActeBSS==false || acteMedVerif==false || isValidDateActeBSBull==false"
+                           data-bs-toggle="modal" data-bs-target="#exampleEditActeModal3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                      <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+                    </svg>
+                    Modifier</button>
+
+
+                  <div class="modal fade" id="exampleEditActeModal3" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h2 class="modal-title" id="exampleModalEditActeLabel3">Modification</h2>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Voulez-vous vraiment modifier cet acte par bulletin de soin  ?
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                          <button type="button" class="btn yes"  (click)="onupdateActeBSMed(ActeBS,selectedrow2.id,selectedActeBS.id,ActeBS.form.controls['codeActeBS'].value,ActeBS.form.controls['matMedcinActeBS'].value,AgentForm,BSFormForSomme)" data-bs-dismiss="modal">Oui</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button  style="width: 150px" class="btn ssss go" *ngIf="!ActeBS.form.controls['matMedcinActeBS'].value && matPharmacieActeBS.value && !matPraticienActeBS.value && ActeBS.form.controls['codeActeBS'].value"
+                           data-bs-toggle="modal" data-bs-target="#exampleEditActeModal2"
+                           [disabled]="ActeBS.invalid || !selectedActeBS || pharVerif == false || isValidDateActeBS==false || isValidDateActeBSS==false || acteMedVerif==false || isValidDateActeBSBull==false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                      <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+                    </svg>
+                    Modifier</button>
+
+                  <div class="modal fade" id="exampleEditActeModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h2 class="modal-title" id="exampleModalEditActeLabel2">Modification</h2>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Voulez-vous vraiment modifier cet acte par bulletin de soin  ?
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                          <button type="button" class="btn yes"  (click)="onupdateActeBSPhar(ActeBS,selectedrow2.id,selectedActeBS.id,ActeBS.form.controls['codeActeBS'].value,matPharmacieActeBS.value,AgentForm,BSFormForSomme)" data-bs-dismiss="modal">Oui</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button  style="width: 150px" class="btn ssss go" *ngIf="!ActeBS.form.controls['matMedcinActeBS'].value && !matPharmacieActeBS.value && matPraticienActeBS.value && ActeBS.form.controls['codeActeBS'].value"
+                           [disabled]="ActeBS.invalid || !selectedActeBS || !verif.value || isValidDateActeBS==false || isValidDateActeBSS==false || acteMedVerif==false || isValidDateActeBSBull==false"
+                           data-bs-toggle="modal" data-bs-target="#exampleEditActeModal1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                      <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+                    </svg>
+                    Modifier</button>
+
+                  <div class="modal fade" id="exampleEditActeModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h2 class="modal-title" id="exampleModalEditActeLabel1">Modification</h2>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Voulez-vous vraiment modifier cet acte par bulletin de soin  ?
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                          <button type="button" class="btn yes" (click)="onupdateActeBSPra(ActeBS,selectedrow2.id,selectedActeBS.id,ActeBS.form.controls['codeActeBS'].value,matPraticienActeBS.value,AgentForm,BSFormForSomme)" data-bs-dismiss="modal">Oui</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button  style="width: 150px" class="btn ssss go" *ngIf="(!ActeBS.form.controls['codeActeBS'].value && !ActeBS.form.controls['matMedcinActeBS'].value && !matPraticienActeBS.value && !matPharmacieActeBS.value) ||
+                                                       (ActeBS.form.controls['codeActeBS'].value  && !ActeBS.form.controls['matMedcinActeBS'].value && !matPraticienActeBS.value && !matPharmacieActeBS.value) ||
+                                                      (ActeBS.form.controls['codeActeBS'].value && matPraticienActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value && matPharmacieActeBS.value) ||
+                                                       (ActeBS.form.controls['codeActeBS'].value && !ActeBS.form.controls['matMedcinActeBS'].value && matPraticienActeBS.value && matPharmacieActeBS.value) ||
+                                                        (ActeBS.form.controls['codeActeBS'].value && !matPraticienActeBS.value && matPharmacieActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value) ||
+                                                         (ActeBS.form.controls['codeActeBS'].value && !matPharmacieActeBS.value && matPraticienActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value) ||
+                                                        (!ActeBS.form.controls['codeActeBS'].value && matPraticienActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value && matPharmacieActeBS.value) ||
+                                                       (!ActeBS.form.controls['codeActeBS'].value && !ActeBS.form.controls['matMedcinActeBS'].value && matPraticienActeBS.value && matPharmacieActeBS.value) ||
+                                                        (!ActeBS.form.controls['codeActeBS'].value && !matPraticienActeBS.value && matPharmacieActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value) ||
+                                                         (!ActeBS.form.controls['codeActeBS'].value && !matPharmacieActeBS.value && matPraticienActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value) ||
+                                                       (!ActeBS.form.controls['codeActeBS'].value && !ActeBS.form.controls['matMedcinActeBS'].value && !matPraticienActeBS.value && matPharmacieActeBS.value) ||
+                                                        (!ActeBS.form.controls['codeActeBS'].value && !matPraticienActeBS.value && !matPharmacieActeBS.value && ActeBS.form.controls['matMedcinActeBS'].value) ||
+                                                         (!ActeBS.form.controls['codeActeBS'].value && !matPharmacieActeBS.value && matPraticienActeBS.value && !ActeBS.form.controls['matMedcinActeBS'].value)"
+                           disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                      <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+                    </svg>
+                    Modifier</button>
+
+                  <span style="padding-left: 2em"></span>
+                  <button class="btn ssee go" style="width: 150px" data-bs-toggle="modal" data-bs-target="#exampleModal1"
+                          [disabled]="ActeBS.invalid || !selectedActeBS || isValidDateActeBS==false || isValidDateActeBSS==false || isValidDateActeBSBull==false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                      <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                    </svg>
+                    Supprimer</button>
+
+                  <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h2 class="modal-title" id="exampleModalLabel2">Suppression</h2>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Voulez-vous vraiment supprimer cet acte par bulletin de soin  ?
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                          <button type="button" class="btn yes" (click)="onDeleteActeBS(selectedActeBS.id,ActeBS,AgentForm,BSFormForSomme)" data-bs-dismiss="modal">Oui</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <span style="padding-left: 2em"></span><button style="width: 150px" class="btn ssee" (click)="cancelClickActBS(ActeBS)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                    <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                  </svg>
+                  Réinitialiser</button>
+                </div></ng-container></div>
+
+          </form>
+        <br>
+    </div>
+  <br><br>
+</div>
+<br>

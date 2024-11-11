@@ -1,0 +1,381 @@
+<div class="m-auto">
+<div class="container-fluid" >
+  <div class="row border border-3 rounded-bottom shadow-sm bg-body rounded">
+    <div>
+      <h4 class="p-3 fs-4 text-secondary text-center">Tableau de bord pour l'année {{date.getFullYear()}}</h4>
+    </div>
+  </div>
+</div>
+
+
+<br><br><br>
+<h5 style="padding-left: 10px;">Statistiques générales : </h5><br>
+<div class="row">
+  <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-body ">
+        <div class="row">
+          <div class="col-5 col-md-4">
+            <div class="icon-big text-center icon-warning">
+              <i class="fa fa-medkit text-black"></i><i class="fas fa-clipboard-list-check"></i>
+            </div>
+          </div>
+          <div class="col-7 col-md-8">
+            <div class="numbers">
+              <p class="card-category">Total des actes médicaux</p>
+              <p class="card-title">{{acteMedical}}
+              <p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          <a routerLink="../ActeMedicalPage" class="text-black-50"><i class="fa fa-check"></i>Accéder aux actes médicaux</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-body ">
+        <div class="row">
+          <div class="col-5 col-md-4">
+            <div class="icon-big text-center icon-warning">
+              <i class="fa fa-hospital-o text-info"></i>
+            </div>
+          </div>
+          <div class="col-7 col-md-8">
+            <div class="numbers">
+              <p class="card-category">Total des praticiens</p>
+              <p class="card-title">{{praticien}}
+              <p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          <a routerLink="../PraticienPage" class="text-black-50"><i class="fa fa-check"></i>Accéder aux praticiens</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-body ">
+        <div class="row">
+          <div class="col-5 col-md-4">
+            <div class="icon-big text-center icon-warning">
+              <i class="fa fa-flask text-success"></i>
+            </div>
+          </div>
+          <div class="col-7 col-md-8">
+            <div class="numbers">
+              <p class="card-category">Total des pharmacies</p>
+              <p class="card-title">{{pharmacie}}
+              <p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          <a routerLink="../PharmaciePage" class="text-black-50"><i class="fa fa-check"></i>Accéder aux pharmacies</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-body ">
+        <div class="row">
+          <div class="col-5 col-md-4">
+            <div class="icon-big text-center icon-warning">
+              <i class="fa fa-heartbeat" style="color: #ff0000"></i>
+            </div>
+          </div>
+          <div class="col-7 col-md-8">
+            <div class="numbers">
+              <p class="card-category">Total des médecins</p>
+              <p class="card-title">{{medecin}}
+              <p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          <a routerLink="../MedecinPage" class="text-black-50"><i class="fa fa-check"></i>Accéder aux médecins</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br><br>
+<div class="row">
+  <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-body ">
+        <div class="row">
+          <div class="col-5 col-md-4">
+            <div class="icon-big text-center icon-warning">
+              <i class="nc-icon nc-bank text-warning"></i>
+            </div>
+          </div>
+          <div class="col-7 col-md-8" >
+            <div class="numbers">
+              <p class="card-category">Total des agences</p>
+              <p class="card-title">{{listAgence}}
+              <p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer ">
+       <hr>
+        <div class="stats">
+          Agence S.R.T.B
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-body ">
+        <div class="row">
+          <div class="col-5 col-md-4">
+            <div class="icon-big text-center icon-warning">
+              <i class="nc-icon nc-money-coins text-success"></i>
+            </div>
+          </div>
+          <div class="col-7 col-md-8">
+            <div class="numbers">
+              <p class="card-category">Somme des B.S</p>
+              <p class="card-title">{{revenue}} DT
+              <p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          <a routerLink="../BordereauxEnvoi" class="text-black-50"><i class="fa fa-check"></i>Accéder aux bordereaux d'envoi</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-body ">
+        <div class="row">
+          <div class="col-5 col-md-4">
+            <div class="icon-big text-center icon-warning">
+              <i class="nc-icon nc-money-coins text-danger"></i>
+            </div>
+          </div>
+          <div class="col-7 col-md-8">
+            <div class="numbers">
+              <p class="card-category">Somme des réglements</p>
+              <p class="card-title">{{listeRevenueReg}} DT
+              <p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          <a routerLink="../BordereauxReglement" class="text-black-50"><i class="fa fa-check"></i>Accéder aux réglements</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-body ">
+        <div class="row">
+          <div class="col-5 col-md-4">
+            <div class="icon-big text-center icon-warning">
+              <i class="fa fa-users text-primary"></i>
+            </div>
+          </div>
+          <div class="col-7 col-md-8">
+            <div class="numbers">
+              <p class="card-category">Total des agents</p>
+              <p class="card-title">{{listeAgents}}
+              <p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          Agents exploitatives : {{listExploi.length}} <span style="padding-left: 20px;"></span> Agents administratives : {{listAdmin.length}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<hr>
+<div class="row">
+  <div class="col-md-4">
+    <div class="card ">
+      <div class="card-header ">
+        <h5 class="card-title">Statistiques des bordereaux</h5>
+        <p class="card-category">Partition des bordreaux d'envoi et de réglement</p>
+      </div>
+      <div class="card-body ">
+        <canvas id="chartEmail2"></canvas>
+      </div>
+      <div class="card-footer ">
+        <div class="legend">
+          <i class="fa fa-circle text-gray"></i> Bordereaux envoi : {{PorcentageBord()}}%
+          <br>
+          <i class="fa fa-circle text-warning"></i> Bordereaux réglément : {{PorcentageBordReg()}}%
+        </div>
+        <hr>
+        <div class="stats">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+          </svg> Nombre des bordereaux envoi dans cette année {{date.getFullYear()}} : {{listeBord.length}}
+        </div><br>
+        <div class="stats">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+          </svg> Nombre des bordereaux réglément dans cette année {{date.getFullYear()}} : {{listeReg.length}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card ">
+      <div class="card-header ">
+        <h5 class="card-title">Bulletins de soins par années</h5>
+        <p class="card-category">Nombre des B.S pour {{date.getFullYear()}}</p>
+      </div>
+      <div class="card-body ">
+        <canvas id=chartHours width="400" height="270"></canvas>
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          <a class="text-black-50" routerLink="../BordereauxEnvoi"><i class="fa fa-check"></i>Accéder aux bulletins de soins</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-chart">
+      <div class="card-header">
+        <h5 class="card-title">B.S: Rapprochés/Non Rapprochés</h5>
+        <p class="card-category">Nombre Des B.S</p>
+      </div>
+      <div class="card-body">
+        <canvas id="speedChart" width="400" height="243"></canvas>
+      </div>
+      <div class="card-footer">
+        <div class="chart-legend">
+          <i class="fa fa-circle text-info"></i> Bulletins de soins rapprochés <br>
+          <i class="fa fa-circle text-warning"></i> Bulletins de soins non rapprochés
+        </div>
+        <hr/>
+        <div class="card-stats">
+          <a class="text-black-50" routerLink="../BordereauxReglement"><i class="fa fa-check"></i>Rapprocher des bulletins de soins</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="card " style="height: 96%;">
+      <div class="card-header ">
+        <h5 class="card-title">Statistiques des agents dans la zone rouge</h5>
+        <p class="card-category">Partition des agents par délai</p>
+      </div>
+      <div class="card-body ">
+        <canvas id="chartEmail3"></canvas>
+      </div>
+      <div class="card-footer ">
+        <div class="legend">
+          <i class="fa fa-circle text-gray"></i> Agents ne sont pas dans la zone rouge : {{PorcentageNonRouge()}}%
+          <br>
+          <i class="fa fa-circle text-danger"></i> Agents dans la zone rouge : {{PorcentageRouge()}}%
+        </div>
+        <hr>
+        <div class="stats">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+          </svg> Nombre des agents qui ne sont pas dans la zone rouge : {{listeNonZoneRouge.length}}
+        </div><br>
+        <div class="stats">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+          </svg> Nombre des agents dans la zone rouge : {{listZoneRouge.length}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card ">
+      <div class="card-header ">
+        <h5 class="card-title">Statistiques de la présence des agents dans leurs visites </h5>
+        <p class="card-category">Partition des Agents par leurs présence dans leurs visites </p>
+      </div>
+      <div class="card-body ">
+        <canvas id="chartEmail4"></canvas>
+      </div>
+      <div class="card-footer ">
+        <div class="legend">
+          <i class="fa fa-circle text-gray"></i> Agents qui n'ont pas fait leurs visites : {{PorcentageFalseVisite()}}%
+          <br>
+          <i class="fa fa-circle text-success"></i> Agents qui ont fait leurs visites : {{PorcentageTrueVisite()}}%
+        </div>
+        <hr>
+        <div class="stats">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+          </svg> Nombre des agents qui n'ont pas fait leurs visites : {{listFalseVisite.length}}
+        </div><br>
+        <div class="stats">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+          </svg> Nombre des agents qui ont fait leurs visites : {{listTrueVisite.length}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-chart">
+      <div class="card-header">
+        <h5 class="card-title">Visites: Replanifiées/Planifiées</h5>
+        <p class="card-category">Nombre des Visites</p>
+      </div>
+      <div class="card-body">
+        <canvas id="speedChart2" width="400" height="270"></canvas>
+      </div>
+      <div class="card-footer">
+        <div class="chart-legend">
+          <i class="fa fa-circle text-danger"></i> Visite replanifiée <br>
+          <i class="fa fa-circle text-success"></i> Visite planifiée
+        </div>
+        <hr/>
+        <div class="card-stats">
+          <a class="text-black-50" routerLink="../VisitePage"><i class="fa fa-check"></i>Accéder aux visites périodiques</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br><br><br>
+</div>

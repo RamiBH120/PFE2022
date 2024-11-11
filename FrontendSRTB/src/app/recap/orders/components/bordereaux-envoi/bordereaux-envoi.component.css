@@ -1,0 +1,170 @@
+.ssss{
+  box-shadow: none;
+  width: 18%;
+  height: 40px;
+  background-color: #212E53;
+  color: #fff;
+  border-radius: 25px;
+  box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff;
+  letter-spacing: 1.3px;
+
+}
+
+.yes{
+  box-shadow: none;
+  width: 13%;
+  height: 40px;
+  background-color: #1eb202;
+  color: #fff;
+  border-radius: 25px;
+  box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff;
+  letter-spacing: 1.3px;
+}
+
+.yes:hover{
+  background-color: #326b29;
+}
+
+.impr{
+
+  box-shadow: none;
+  width: 60%;
+  height: 40px;
+  background-color: #212E53;
+  color: #fff;
+  border-radius: 25px;
+  box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff;
+  letter-spacing: 1.3px;
+
+}
+
+.mat-button-toggle-checked {
+  background-color: #2871cc !important;
+  color: white !important;
+}
+
+.impr:hover{
+  background-color: #039BE5;
+}
+
+.ssss:hover{
+  background-color: #039BE5;
+
+}
+
+
+.wait{
+  box-shadow: none;
+  width: 13%;
+  height: 40px;
+  background-color: #1eb202;
+  color: #fff;
+  border-radius: 25px;
+  box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff;
+  letter-spacing: 1.3px;
+}
+
+.wait:hover{
+  background-color: #326b29;
+}
+
+
+.ssee{
+  box-shadow: none;
+  width: 18%;
+  height: 40px;
+  background-color: #e10707;
+  color: #fff;
+  border-radius: 25px;
+  box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff;
+  letter-spacing: 1.3px;
+}
+
+.ssee:hover{
+  background-color: #af0b0b;
+}
+
+
+.stop{
+  box-shadow: none;
+  width: 13%;
+  height: 40px;
+  background-color: #e10707;
+  color: #fff;
+  border-radius: 25px;
+  box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff;
+  letter-spacing: 1.3px;
+}
+
+
+.stop:hover{
+  background-color: #af0b0b;
+}
+
+.cursor{
+  cursor: pointer;
+}
+
+.cursor:hover{
+  background-color: #cbced1;
+}
+
+
+.go{
+  left: 10em;
+}
+.hide{
+  display:none;
+}
+
+#datalist {
+  display: none;
+  height: 80vh;
+  overflow: auto;
+  left:0;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+#datalist option {
+  font-family: arial;
+  font-size: 11.8px;
+  cursor: pointer;
+  padding: 5px 10px;
+  font-weight: bold;
+}
+#datalist option:hover {
+  background-color: #bfddf5;
+}
+
+#datalist.show {
+  display: block;}
+datalist {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.mat-row.highlight .mat-cell{
+  background-color: #212E53 !important;
+  color: white !important;
+  pointer-events: none;
+}
+
+input[type="date"]::before{
+  content: attr(placeholder)" : ";
+  white-space: pre;
+}
+input[type="date"]:focus::before {
+  content:""!important;
+}
+
+.mat-row.highlight .mat-cell{
+  background-color: #039BE5 !important;
+  color: white !important;
+}
+
+.bordright{
+  border-right: thin solid gray;
+}
+.bordleft{
+  border-left: thin solid gray;
+}

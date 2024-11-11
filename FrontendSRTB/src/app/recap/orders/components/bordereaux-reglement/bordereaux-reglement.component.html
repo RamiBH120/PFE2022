@@ -1,0 +1,902 @@
+<div class="container-fluid" >
+  <div class="row border border-3 rounded-bottom shadow-sm bg-body rounded">
+    <div>
+      <h4 class="p-3 fs-4 text-secondary text-center">Gestion des bordereaux de règlement</h4>
+    </div>
+  </div>
+</div>
+<br>
+
+<br>
+
+<div class="row justify-content-between">
+  <div class="col-2" style="padding-left: 2em;">
+    <button class="btn impr"
+            data-bs-toggle="modal" data-bs-target="#exampleModalBS">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+        <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+        <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+      </svg>
+      Imprimer</button>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalBS" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="fw-bolder modal-title" style="color: #212E53" id="exampleModalLabelBS">Impression</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h3 class="fw-bolder" style="color: #0e457a">Imprimer des bulletins de soins par agence</h3>
+            <p>Cliquer ici pour imprimer
+              <button type="button" class="btn okbut" (click)="pdfGenerateBullByAgence()" data-bs-dismiss="modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+                  <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                  <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                </svg>
+                Imprimer</button></p>
+            <hr>
+            <h3 class="fw-bolder" style="color: #076204">Imprimer des bulletins de soins qui sont rapprochées</h3>
+            <p>Il faut séléctionner un bordereau de règlements cloturé.</p>
+            <p>Cliquer ici pour imprimer
+              <button type="button" class="btn yesbut" [disabled]="!selectedRow || (selectedRow && cloForBR == false)" (click)="pdfGenerateBorEnv()" data-bs-dismiss="modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+                  <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                  <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                </svg>
+                Imprimer</button></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn stoped" data-bs-dismiss="modal">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+              </svg>
+              Annuler</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3" style="padding-right: 2em;">
+    <mat-form-field class="example-full-width" style="width: 100% ;">
+      <input matInput placeholder="Chercher un bordereau de règlement" autocomplete="off" #nombr (keyup)="findByName(nombr)">
+    </mat-form-field>
+  </div>
+</div>
+<br>
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z8" style="width: 100%;">
+
+  <ng-container matColumnDef="nom">
+    <th mat-header-cell *matHeaderCellDef> RÉFÉRENCE DU BORDEREAU DE RÉGLEMENT</th>
+    <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="date">
+    <th mat-header-cell *matHeaderCellDef> DATE DE RÉGLEMENT</th>
+    <td mat-cell *matCellDef="let element"> {{element.date}} </td>
+  </ng-container>
+
+
+  <ng-container matColumnDef="montantreg">
+    <th mat-header-cell *matHeaderCellDef> MONTANT DE RÉGLEMENT (DT)</th>
+    <td mat-cell *matCellDef="let element"> {{element.montantreg}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="fileDB">
+    <th mat-header-cell *matHeaderCellDef> FICHIER DE RÉGLEMENT</th>
+    <td mat-cell *matCellDef="let element"> {{element.fileDB.name}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="cloture">
+    <th mat-header-cell *matHeaderCellDef>BORDEREAU DE RÉGLEMENT CLOTURÉ</th>
+    <td mat-cell *matCellDef="let element"> {{element.cloture == true ? 'Oui' : 'Non'}} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor"
+      [ngClass]="{'highlight' : highlightForBR() == row.id}"
+      (click)="onRowClicked(row)"></tr>
+</table>
+
+<mat-paginator #paginatorBr class="paginator" [length]="100"
+               [pageSize]="3"
+               [pageSizeOptions]="[1,3, 6 , 9 , 12]">
+</mat-paginator>
+
+
+<br>
+<div class="container-fluid" >
+  <div class="row mr-2 ml-2" >
+
+      <form #addForm="ngForm" action="" class="mt-5 border p-4 bg-light shadow">
+        <div style="padding-left: 90%;">
+          <button *ngIf="selectedRow" class="btn cloture" [disabled]="cloForBR == true || checkSele == false || btn == true"
+                  (click)="onUploadUpdateNoFileCloture(addForm)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
+              <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+            </svg>
+            Clôturer</button>
+        </div>
+        <h4 class="mb-5 fs-4 text-secondary">Informations sur la gestion des bordereaux de règlement</h4>
+
+          <div class="row border border-3 rounded-3 mt-2">
+            <div class="mb-3 col-md-3">
+              <label>Référence<span class="text-danger">*</span></label>
+              <ng-container *ngIf="!selectedRow">
+              <input type="text" ngModel
+                     (keyup)="existsBordReg(nom.value)" (focus)="existsBordReg(nom.value)" (change)="existsBordReg(nom.value)"
+                     name="nom" class="form-control" required
+                     pattern="^[A-Za-z][0-9A-Za-z-]{2,20}$"  #nom="ngModel" [class.is-invalid]="nom.invalid && nom.touched" autocomplete='off'>
+              <small class="text-danger" *ngIf="(bord==true && nom.value && !nom.errors && nom.touched)">{{bordExpression}}</small>
+              <div *ngIf="nom.errors && (nom.invalid && nom.touched)">
+                <small class="text-danger" *ngIf="nom.errors?.['required']" >Ce champ est obligatoire!</small>
+                <small class="text-danger" *ngIf="nom.errors?.['pattern']" >Ce champ est invalide</small>
+              </div>
+              </ng-container>
+              <ng-container *ngIf="selectedRow">
+              <input type="text"
+                     (keyup)="existsBordReg(nom.value) || equalsRef(selectedRow.nom,nom.value)"
+                     (focus)="existsBordReg(nom.value) || equalsRef(selectedRow.nom,nom.value)"
+                     (change)="existsBordReg(nom.value) && equalsRef(selectedRow.nom,nom.value)"
+                     [disabled]="cloForBR == true"
+                     ngModel="{{selectedRow.nom}}" name="nom" class="form-control" required
+                     pattern="^[A-Za-z][0-9A-Za-z-]{2,20}$"  #nom="ngModel" [class.is-invalid]="nom.invalid && nom.touched" autocomplete='off'>
+              <small class="text-danger" *ngIf="(bord==true && (eqNom==false) && nom.touched &&
+                 nom.value && !nom.errors)">{{bordExpression}}</small>
+              <div *ngIf="nom.errors && (nom.invalid && nom.touched)">
+                <small class="text-danger" *ngIf="nom.errors?.['required']" >Ce champ est obligatoire!</small>
+                <small class="text-danger" *ngIf="nom.errors?.['pattern']" >Ce champ est invalide</small>
+              </div>
+              </ng-container>
+
+            </div>
+
+          <div class="mb-3 col-md-2">
+            <label>Date de création <span class="text-danger">*</span></label>
+            <ng-container *ngIf="!selectedRow">
+            <input type="text" ngModel name="date" class="form-control" placeholder="YYYY-MM-DD"
+                   onfocus="(this.type='date')"
+                   onblur="(this.type='text')" required
+                   #date="ngModel" [class.is-invalid]="date.invalid && date.touched" autocomplete='off'>
+            <small class="text-danger" [class.d-none]="date.valid || date.untouched">Ce champ est obligatoire!</small>
+            </ng-container>
+            <ng-container *ngIf="selectedRow">
+            <input type="text" ngModel="{{selectedRow.date}}" name="date" class="form-control" placeholder="YYYY-MM-DD"
+                   onfocus="(this.type='date')"
+                   onblur="(this.type='text')" required
+                   #date="ngModel" [class.is-invalid]="date.invalid && date.touched" autocomplete='off'>
+            <small class="text-danger" [class.d-none]="date.valid || date.untouched">Ce champ est obligatoire!</small>
+            </ng-container>
+
+          </div>
+
+      <div class="mb-3 col-md-5">
+        <label>Fichier de règlement <span class="text-danger">*</span></label>
+
+        <ng-container *ngIf="!selectedRow">
+        <div class="file-upload input-group">
+          <input type="file" name="fileDB" class="form-control file-input" [disabled]="delete == true" #takeInput
+                 (change)="onChange($event)" aria-label="Recipient's username" aria-describedby="button-addonAdd button-addonAddAdd button-addonAddAddAdd">
+          <button *ngIf="(delete == null || delete == false) && (checkExist == true || checkExist == null)" class="btn btn-outline-secondary" id="button-addonAdd"
+                  data-bs-toggle="modal" data-bs-target="#exampleModalPop"
+                  (click)="buttonForUpload()" [disabled]="checkfilForPop == false || file == null || checkSize==false"
+                  type="button">Chargement</button>
+          <button *ngIf="delete == true && (checkExist == true || checkExist == null)" class="btn btn-outline-secondary" id="button-addonAddAdd"
+                  data-bs-toggle="modal" data-bs-target="#exampleModalPop"
+                  [disabled]="checkfilForPop == false || file == null || checkSize==false"
+                  type="button">Chargement</button>
+          <button *ngIf="checkExist==false" class="btn btn-outline-secondary" id="button-addonAddAddAdd"
+                  data-bs-toggle="modal" data-bs-target="#exampleModalPop"
+                  [disabled]="checkfilForPop == false || file == null || checkSize==false"
+                  type="button">Chargement</button>
+        <div class="container" *ngIf="loading">
+          <div class="spinner-border text-primary" role="status">
+             <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        </div></ng-container>
+
+        <ng-container *ngIf="selectedRow && btn==true">
+        <div class="file-upload input-group" >
+          <input type="file" name="fileDB" id="formFile"
+                 class="form-control file-input" (change)="onChange($event)" [disabled]="delete == true"
+                 aria-label="Recipient's username" #takeInput
+                 aria-describedby="button-addon3 button-addon33 button-addon333 button-addon3333">
+          <button class="btn btn-outline-secondary" id="button-addon3" (click)="onChangeBtnForFileForBack()"
+                  type="button">Annuler</button>
+          <button *ngIf="(delete == null || delete == false) && (checkExist == true || checkExist == null)"
+                  class="btn btn-outline-secondary"
+                  data-bs-toggle="modal" data-bs-target="#exampleModalPop"
+                  [disabled]="checkfilForPop == false || file == null || checkSize==false" (click)="buttonForUpload()"
+                  id="button-addon33" type="button">Chargement</button>
+          <button *ngIf="delete == true && (checkExist == true || checkExist == null)" class="btn btn-outline-secondary"
+                  data-bs-toggle="modal" data-bs-target="#exampleModalPop"
+                  [disabled]="checkfilForPop == false || file == null || checkSize==false"
+                  id="button-addon333" type="button">Chargement</button>
+          <button *ngIf="checkExist==false" class="btn btn-outline-secondary"
+                  id="button-addon3333"
+                  data-bs-toggle="modal" data-bs-target="#exampleModalPop"
+                  [disabled]="checkfilForPop == false || file == null || checkSize==false"
+                  type="button">Chargement</button>
+
+          <div class="container" *ngIf="loading">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div></ng-container>
+
+        <ng-container *ngIf="selectedRow && btn==false">
+        <div class="input-group" >
+          <input type="text" ngModel="{{selectedRow.fileDB.name}}" name="fileDB" class="form-control"
+                 aria-label="Recipient's username" aria-describedby="button-addon2"
+                 disabled>
+          <button class="btn btn-outline-secondary" [disabled]="cloForBR==true || boll==true" id="button-addon2" (click)="onChangeBtnForFile()"
+                  type="button">Choisir un autre fichier</button>
+        </div></ng-container>
+
+
+        <div class="container" *ngIf="loading">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+
+
+      </div>
+
+              <!-- Modal -->
+              <div class="modal fade" data-bs-keyboard="false" data-bs-backdrop="static" id="exampleModalPop"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-xl">
+                  <div class="modal-content">
+                    <div class="modal-header" *ngIf="file != null">
+                      <h2 class="modal-title" id="exampleModalLabelPop">Chargement d'un fichier : {{ file.name }}</h2>
+                      <button *ngIf="delete == true" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" *ngIf="checkSpinner==false">
+                      <div class="d-flex justify-content-center">
+                        <div class="spinner-border" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-body" *ngIf="checkSpinner==true">
+                      <div>
+                        <h3>Le montant total de ce fichier de règlement est : {{ sum }} DT</h3>
+                      </div>
+                      <div class="col-md-3" style="padding-right: 2em;">
+                        <mat-form-field class="example-full-width" style="width: 100% ;">
+                          <input matInput placeholder="Chercher dans le fichier" #nomn autocomplete="off" (keyup)="findFiltredPopUp(nomn)">
+                        </mat-form-field>
+                      </div>
+                      <cdk-virtual-scroll-viewport itemSize="48" style="height: 400px;">
+                        <table mat-table [dataSource]="dataSourceForPopUp"  class="mat-elevation-z8" style="width: 100%;" multiTemplateDataRows>
+                          <ng-container matColumnDef="codeAff">
+                            <th mat-header-cell *matHeaderCellDef > CODE.AFF</th>
+                            <td mat-cell *matCellDef="let element"> {{element.codeAff}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="codePrest">
+                            <th mat-header-cell *matHeaderCellDef> CODE.PREST</th>
+                            <td mat-cell *matCellDef="let element"> {{element.codePrest}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="dateBs">
+                            <th mat-header-cell *matHeaderCellDef> DATE.B.S</th>
+                            <td mat-cell *matCellDef="let element"> {{element.dateBs}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="codeActe">
+                            <th mat-header-cell *matHeaderCellDef> CODE.ACTE</th>
+                            <td mat-cell *matCellDef="let element"> {{element.codeActe}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="refBS">
+                            <th mat-header-cell *matHeaderCellDef> RÉF.B.S</th>
+                            <td mat-cell *matCellDef="let element"> {{element.refBS}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="refBord">
+                            <th mat-header-cell *matHeaderCellDef> RÉF.BORD.ENV</th>
+                            <td mat-cell *matCellDef="let element"> {{element.refBord}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="tauxRembEnv">
+                            <th mat-header-cell *matHeaderCellDef>TAUX.REMB.ENV</th>
+                            <td mat-cell *matCellDef="let element"> {{element.tauxRembEnv}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="tauxRembRecep">
+                            <th mat-header-cell *matHeaderCellDef>TAUX.REMB.RÉCEP</th>
+                            <td mat-cell *matCellDef="let element"> {{element.tauxRembRecep}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="motifLitige">
+                            <th mat-header-cell *matHeaderCellDef>MOTIF.LITIGE</th>
+                            <td mat-cell *matCellDef="let element"> {{element.motifLitige}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="montActe">
+                            <th mat-header-cell *matHeaderCellDef> MONT.ACTE (DT)</th>
+                            <td mat-cell *matCellDef="let element"> {{element.montActe}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="montRemb">
+                            <th mat-header-cell *matHeaderCellDef> MONT.REMB (DT)</th>
+                            <td mat-cell *matCellDef="let element"> {{element.montRemb}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="dateRemb">
+                            <th mat-header-cell *matHeaderCellDef> DATE.REMB</th>
+                            <td mat-cell *matCellDef="let element"> {{element.dateRemb}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="expandedDetail">
+                            <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumnsFichInfo2.length">
+                              <div class="example-element-detail"
+                                   [@detailExpand]="element == expandedElement2 ? 'expanded' : 'collapsed'">
+                                <div class="row m-1" *ngIf="element.msg">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-right" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1.5 1.5A.5.5 0 0 0 1 2v4.8a2.5 2.5 0 0 0 2.5 2.5h9.793l-3.347 3.346a.5.5 0 0 0 .708.708l4.2-4.2a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 8.3H3.5A1.5 1.5 0 0 1 2 6.8V2a.5.5 0 0 0-.5-.5z"/>
+                                  </svg>
+                                  <h3> {{element.codeAff}} : {{element.msg}}</h3>
+                                </div>
+                              </div>
+                            </td>
+                          </ng-container>
+                          <tr mat-header-row *matHeaderRowDef="displayedColumnsFichInfo2; sticky:true"></tr>
+                          <tr mat-row *matRowDef="let element;index as indexOfelement; columns: displayedColumnsFichInfo2;"
+                              class="cursor example-element-row"
+                              [class.example-expanded-row]="expandedElement2 === element"
+                              (click)="(expandedElement2 = expandedElement2 === element ? null : element)"></tr>
+                          <tr mat-row *matRowDef="let rowfi; columns: ['expandedDetail'];"
+                              class="example-detail-row"></tr>
+                        </table>
+                      </cdk-virtual-scroll-viewport>
+                      <h3>Voulez vous vraiment sauvegarder ce fichier ?</h3>
+                    </div>
+                    <div class="modal-footer" >
+                      <button type="button" class="btn stop" data-bs-dismiss="modal" [disabled]="checkSpinner==false" (click)="deleteFileDB()">Non</button>
+                      <button type="button" class="btn wait" data-bs-dismiss="modal" (click)="ouiPop()" [disabled]="clickForPop==false || checkSpinner==false || delete == true">Oui</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            <div class="mb-3 col-md-2" *ngIf="delete == true">
+
+              <label>Montant de règlement </label>
+              <div class="input-group">
+                <input type="text" ngModel="{{sum}}" name="montantreg" class="form-control" readonly
+                       #montReg="ngModel">
+                <div class="input-group-append">
+                  <span class="input-group-text">DT</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3 col-md-2" *ngIf="delete == false || delete == null">
+              <label>Montant de règlement </label>
+              <ng-container *ngIf="!selectedRow">
+              <div class="input-group">
+                <input type="text" ngModel="{{0.0}}" name="montantreg" class="form-control" readonly
+                       #montReg="ngModel">
+                <div class="input-group-append">
+                  <span class="input-group-text">DT</span>
+                </div>
+              </div></ng-container>
+              <ng-container *ngIf="selectedRow">
+              <div class="input-group" >
+                <input type="text" ngModel="{{selectedRow.montantreg}}" name="montantreg" class="form-control" readonly
+                       #montReg="ngModel">
+                <div class="input-group-append">
+                  <span class="input-group-text">DT</span>
+                </div>
+              </div></ng-container>
+
+            </div>
+
+
+          </div>
+          <div class="row border border-3 rounded-3 mt-2">
+
+          <div class="mb-3 col-md-12">
+            <label class="form-label">Description du bordereau de règlement </label>
+            <ng-container *ngIf="!selectedRow">
+            <textarea class="form-control" id="exampleFormControlTextarea2" rows="4"
+                      ngModel name="description"
+                      #description="ngModel" [class.is-invalid]="description.invalid && description.touched"></textarea>
+            </ng-container>
+            <ng-container *ngIf="selectedRow">
+            <textarea class="form-control" rows="4"
+                      ngModel="{{selectedRow.description}}" name="description" [disabled]="cloForBR == true"
+                      #description="ngModel" [class.is-invalid]="description.invalid && description.touched"></textarea>
+            </ng-container>
+          </div>
+
+          </div>
+
+
+
+<br>
+
+        <div class="row" *ngIf="selectedRow">
+          <hr style="width: 98%;border-bottom: 2px solid ;">
+
+          <div class="col-sm-12">
+            <div class="row border border-3 rounded-3  mt-2">
+              <div style="width: 97%;position: relative;left: 1.5%">
+            <div class="row justify-content-between">
+              <div class="col-md-6" style="padding-left: 2em;">
+                <h2 class="m-1 text-secondary" *ngIf="btn==false">Informations sur le fichier de règlement</h2>
+                <h2 class="m-1 text-secondary" *ngIf="btn==true">Informations sur le fichier de règlement ancien</h2>
+              </div>
+              <div class="col-md-3" style="padding-right: 2em;">
+                <mat-form-field class="example-full-width" style="width: 100% ;">
+                  <input matInput placeholder="Chercher dans le fichier" #nomrg autocomplete="off" (keyup)="findByNameRg(nomrg)">
+                </mat-form-field>
+              </div>
+            </div>
+
+            <br>
+
+            <div *ngIf="checkSele==false"
+                 style="display: flex; justify-content: center; align-items: center; background: white; height: 100px">
+              <div class="d-flex justify-content-center" style="padding-bottom: 5px;">
+                <div class="spinner-border" role="status" >
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            </div>
+
+            <table *ngIf="checkSele==true" mat-table  [dataSource]="dataSourceFichInfo" class="mat-elevation-z8" style="width: 100%;" multiTemplateDataRows>
+
+
+              <ng-container matColumnDef="codeAff">
+                <th mat-header-cell *matHeaderCellDef > CODE.AFF</th>
+                <td mat-cell *matCellDef="let element" > {{element.codeAff}} </td>
+              </ng-container>
+
+
+              <ng-container matColumnDef="codePrest">
+                <th mat-header-cell *matHeaderCellDef> CODE.PREST</th>
+                <td mat-cell *matCellDef="let element"> {{element.codePrest}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="dateBs">
+                <th mat-header-cell *matHeaderCellDef> DATE.B.S</th>
+                <td mat-cell *matCellDef="let element"> {{element.dateBs}} </td>
+              </ng-container>
+
+
+              <ng-container matColumnDef="codeActe">
+                <th mat-header-cell *matHeaderCellDef> CODE.ACTE</th>
+                <td mat-cell *matCellDef="let element"> {{element.codeActe}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="refBS">
+                <th mat-header-cell *matHeaderCellDef> RÉF.B.S</th>
+                <td mat-cell *matCellDef="let element"> {{element.refBS}} </td>
+              </ng-container>
+
+
+              <ng-container matColumnDef="refBord">
+                <th mat-header-cell *matHeaderCellDef> RÉF.BORD.ENV</th>
+                <td mat-cell *matCellDef="let element"> {{element.refBord}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="tauxRembEnv">
+                <th mat-header-cell *matHeaderCellDef>TAUX.REMB.ENV</th>
+                <td mat-cell *matCellDef="let element"> {{element.tauxRembEnv}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="tauxRembRecep">
+                <th mat-header-cell *matHeaderCellDef>TAUX.REMB.RÉCEP</th>
+                <td mat-cell *matCellDef="let element"> {{element.tauxRembRecep}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="motifLitige">
+                <th mat-header-cell *matHeaderCellDef>MOTIF.LITIGE</th>
+                <td mat-cell *matCellDef="let element"> {{element.motifLitige}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="montActe">
+                <th mat-header-cell *matHeaderCellDef> MONT.ACTE (DT)</th>
+                <td mat-cell *matCellDef="let element"> {{element.montActe}} </td>
+              </ng-container>
+
+
+              <ng-container matColumnDef="montRemb">
+                <th mat-header-cell *matHeaderCellDef> MONT.REMB (DT)</th>
+                <td mat-cell *matCellDef="let element"> {{element.montRemb}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="dateRemb">
+                <th mat-header-cell *matHeaderCellDef> DATE.REMB</th>
+                <td mat-cell *matCellDef="let element"> {{element.dateRemb}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="expandedDetail">
+                <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumnsFichInfo.length">
+                  <div class="example-element-detail"
+                       [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                    <div class="row align-items-start" *ngIf="element.msg">
+                      <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-right" viewBox="0 0 16 16">
+                          <path fill-rule="evenodd" d="M1.5 1.5A.5.5 0 0 0 1 2v4.8a2.5 2.5 0 0 0 2.5 2.5h9.793l-3.347 3.346a.5.5 0 0 0 .708.708l4.2-4.2a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 8.3H3.5A1.5 1.5 0 0 1 2 6.8V2a.5.5 0 0 0-.5-.5z"/>
+                        </svg>
+                        Message de Litige : {{element.msg}}</h3>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumnsFichInfo; sticky:true"></tr>
+              <tr mat-row *matRowDef="let element; columns: displayedColumnsFichInfo;"
+                  class="cursor example-element-row"
+                  [class.example-expanded-row]="expandedElement === element"
+                  (click)="(expandedElement = expandedElement === element ? null : element) && onRowClickedReg(element)"
+                  [ngClass]="{'highlight': highlightRGRefBS()==element.refBS && highlightRGAff()==element.codeAff}"></tr>
+              <tr mat-row *matRowDef="let rowfi; columns: ['expandedDetail'];"
+                  class="example-detail-row cursor"></tr>
+
+            </table>
+
+            <mat-paginator [hidden]="checkSele==false" #paginatorRg class="paginator" [length]="100"
+                           [pageSize]="5"
+                           [pageSizeOptions]="[1,5, 10 , 50]">
+            </mat-paginator>
+              </div>
+
+        </div>
+          </div>
+
+        <br>
+     <div *ngIf="btn==false">
+        <div class="col-lg-12 m-2">
+      <mat-button-toggle style="width: 150px;height:40px;align-items: center;border-radius: 25px;background-color: #039BE5;color: white;" class="blueClair" type="button" [disabled]="!selectedRow" (click)="getFileandBS()" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+          <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+          <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+        </svg>
+        Rapprocher
+      </mat-button-toggle></div>
+
+      <div class="collapse" id="collapseExample">
+        <div class="row">
+        <div class="col-md-12">
+          <div class="row justify-content-between m-2">
+            <div class="col-md-3" style="padding-left: 4%">
+              <button mat-raised-button class="opssi" style="width: 250px;border-radius: 25px;" type="button" [disabled]="!selectedRow || group.value!='Automatique' || cloForBR == true" (click)="autoFilter()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16">
+                  <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+                </svg>
+                Rapprochement auto
+              </button>
+
+            </div>
+              <div class="col-md-3" style="padding-left: 5%">
+                <mat-button-toggle-group #group="matButtonToggleGroup">
+                  <mat-button-toggle checked value="Automatique" (click)="getBSActeBS()" class="blar">Automatique
+                  </mat-button-toggle>
+                  <mat-button-toggle value="Manuel" (click)="getBS()" class="blar">Manuel
+                  </mat-button-toggle>
+                </mat-button-toggle-group>
+              </div>
+            <div class="col-md-3" *ngIf="(checkLitige == true) && (cheSel==true)" style="padding-left: 3%">
+              <button mat-raised-button class="opssi" style="width: 250px;border-radius: 25px;" type="button"
+                      [disabled]="!selectedRow || !selectedRowBS || !selectedRowrg || selectedIndexBS<0 ||selectedIndexRg<0 || group.value!='Manuel' || cloForBR == true || difference()==false"
+                      (click)="filterRow()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16">
+                  <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+                </svg>
+                Rapprochement manuel
+              </button>
+            </div>
+            <div class="col-md-3" *ngIf="(checkLitige == false) || (cheSel==false)" style="padding-left: 3%">
+              <button mat-raised-button class="opssi" style="width: 250px;border-radius: 25px;" type="button" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16">
+                  <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+                </svg>
+                Rapprochement manuel
+              </button>
+            </div>
+
+            <span style="padding-bottom: 2%"></span>
+
+            <div *ngIf="selectedRow && ((!selectedRowrg || !selectedRowBS) || ((checkLitige == false) || (cheSel==false))) && group.value=='Manuel'" class="alert alert-danger d-flex align-items-center" role="alert">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+              </svg>
+              Veuillez séléctionner des bulletins qui ont la même matricule d'un agent et qui sont remboursés (décompte).
+            </div>
+
+            <div *ngIf="selectedRowrg && selectedRowBS && difference()==false && group.value=='Manuel' && (checkLitige == true) && (cheSel==true)" class="alert alert-primary d-flex align-items-center" role="alert">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+              </svg>
+              Les bulletins séléctionnés n'ont pas le même nombre des actes.
+            </div>
+
+            <div class="row border border-3 rounded-3  mt-2" style="position: relative;left: 1em;">
+                <div class="row justify-content-between">
+                  <div class="col-md-6" >
+                    <h2 class="m-1 text-secondary">Liste des bulletins de soins</h2>
+                  </div>
+                  <div class="col-md-3" style="padding-left: 3em;" *ngIf="group.value == 'Automatique'">
+                    <mat-form-field class="example-full-width" style="width: 110% ;">
+                      <input matInput placeholder="Chercher un bulletin de soin" #nombs autocomplete="off" (keyup)="findBS(nombs)">
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-3" style="padding-left: 3em;" *ngIf="group.value == 'Manuel'">
+                    <mat-form-field class="example-full-width" style="width: 100% ;">
+                      <input matInput placeholder="Chercher un bulletin de soin" #nombs autocomplete="off" (keyup)="findBSMan(nombs)">
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div *ngIf="checkSele==false"
+                     style="display: flex; justify-content: center; align-items: center; background: white; height: 100px">
+                  <div class="d-flex justify-content-center" style="padding-bottom: 5px;">
+                    <div class="spinner-border" role="status" >
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                </div>
+
+                <table *ngIf="group.value == 'Automatique' && checkSele==true" mat-table [dataSource]="dataSourceBSAuto" class="mat-elevation-z8" style="width: 100%;">
+
+                  <ng-container matColumnDef="numbs">
+                    <th mat-header-cell *matHeaderCellDef> NUMÉRO B.S</th>
+                    <td mat-cell *matCellDef="let element"> {{element.numbs}}</td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="refbord">
+                    <th mat-header-cell *matHeaderCellDef> RÉF BORD ENV</th>
+                    <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="numaff">
+                    <th mat-header-cell *matHeaderCellDef> NUMÉRO AFF B.S</th>
+                    <td mat-cell *matCellDef="let element"> {{element.agent.matstar}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="datebs">
+                    <th mat-header-cell *matHeaderCellDef> DATE B.S</th>
+                    <td mat-cell *matCellDef="let element"> {{element.datebs}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="typemalade">
+                    <th mat-header-cell *matHeaderCellDef> TYPE.MALADE B.S</th>
+                    <td mat-cell *matCellDef="let element"> {{element.typemalade}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="codeActeBS">
+                    <th mat-header-cell *matHeaderCellDef> CODE ACTE B.S </th>
+                    <td mat-cell *matCellDef="let element"> {{checkCode(element)}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="montantActeBS">
+                    <th mat-header-cell *matHeaderCellDef> MONTANT ACTE B.S (DT)</th>
+                    <td mat-cell *matCellDef="let element"> {{element.montantActeBS}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="beneficiaire">
+                    <th mat-header-cell *matHeaderCellDef> BÉNÉFI ACTE B.S</th>
+                    <td mat-cell *matCellDef="let element"> {{element.beneficiaire}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="dateActeBS">
+                    <th mat-header-cell *matHeaderCellDef> DATE ACTE B.S</th>
+                    <td mat-cell *matCellDef="let element"> {{element.dateActeBS}} </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumnsBS;sticky:true"></tr>
+                  <tr mat-row *matRowDef="let rowbs; columns: displayedColumnsBS;" class="cursor"></tr>
+                </table>
+
+                <table *ngIf="group.value != 'Automatique' && checkSele==true"  mat-table [dataSource]="dataSourceBSMan" class="mat-elevation-z8" style="width: 100%;">
+
+                  <ng-container matColumnDef="numbs">
+                    <th mat-header-cell *matHeaderCellDef> NUMÉRO B.S</th>
+                    <td mat-cell *matCellDef="let element"> {{element.numbs}}</td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="refbord">
+                    <th mat-header-cell *matHeaderCellDef> RÉF BORD ENV</th>
+                    <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="numaff">
+                    <th mat-header-cell *matHeaderCellDef> NUMÉRO AFF B.S</th>
+                    <td mat-cell *matCellDef="let element"> {{element.agent.matstar}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="datebs">
+                    <th mat-header-cell *matHeaderCellDef> DATE B.S</th>
+                    <td mat-cell *matCellDef="let element"> {{element.datebs}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="typemalade">
+                    <th mat-header-cell *matHeaderCellDef> TYPE.MALADE B.S</th>
+                    <td mat-cell *matCellDef="let element"> {{element.typemalade}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="codeActeBS">
+                    <th mat-header-cell *matHeaderCellDef> CODE ACTE B.S </th>
+                    <td mat-cell *matCellDef="let element"> {{checkCode(element)}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="montantActeBS">
+                    <th mat-header-cell *matHeaderCellDef> MONTANT ACTE B.S (DT)</th>
+                    <td mat-cell *matCellDef="let element"> {{element.montantActeBS}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="beneficiaire">
+                    <th mat-header-cell *matHeaderCellDef> BÉNÉFI ACTE B.S</th>
+                    <td mat-cell *matCellDef="let element"> {{element.beneficiaire}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="dateActeBS">
+                    <th mat-header-cell *matHeaderCellDef> DATE ACTE B.S</th>
+                    <td mat-cell *matCellDef="let element"> {{element.dateActeBS}} </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumnsBS;sticky:true"></tr>
+                  <tr mat-row *matRowDef="let rowbs; columns: displayedColumnsBS;" class="cursor"
+                      [ngClass]="{'highlight':highlightBSNumBS()==rowbs.numbs && highlightBSStar()==rowbs.agent.matstar}"
+                      (click)="onRowClickedBS(rowbs)"></tr>
+                </table>
+                <mat-paginator [hidden]="checkSele==false" #paginatorBs class="paginator" [length]="100"
+                               [pageSize]="5"
+                               [pageSizeOptions]="[1,5, 10 , 50]">
+                </mat-paginator>
+               </div>
+          </div>
+
+              <br>
+            </div>
+            <br>
+          </div>
+        <div style="padding-left: 4.5em;">
+        <button *ngIf="selectedRow && selectedRowrg && !selectedRowBS" mat-raised-button class="ops" style="width: 250px;border-radius: 25px;" type="button" (click)="cancelSelectRg()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+          </svg>
+          Annuler la sélection
+        </button>
+        <button *ngIf="selectedRow && selectedRowBS && !selectedRowrg" mat-raised-button class="ops" style="width: 250px;border-radius: 25px;" type="button" (click)="cancelSelectBS()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+          </svg>
+          Annuler la sélection
+        </button>
+        <button *ngIf="selectedRow && selectedRowBS && selectedRowrg" mat-raised-button class="ops" style="width: 250px;border-radius: 25px;" type="button" (click)="cancelSelectBSRg()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+          </svg>
+          Annuler la sélection
+        </button>
+        <button  *ngIf="selectedRow && !selectedRowBS && !selectedRowrg" mat-raised-button class="ops" style="width: 250px;border-radius: 25px;" type="button" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+          </svg>
+          Annuler la sélection
+        </button>
+        </div>
+         </div>
+        </div>
+        </div>
+        <br>
+        <hr style="border-bottom: 2px solid ;">
+        <br>
+        <div class="col-md-12">
+          <span style="padding-left: 22%;"></span>
+          <button class="btn ssbb" style="width: 150px;" [disabled]="addForm.invalid || selectedRow || !stat || checkfile==false || cloForBR == true || delete==false || delete == null || bord==true" data-bs-toggle="modal" data-bs-target="#exampleModalAdd1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+            </svg>
+            Ajouter</button>
+
+          <!-- Modal -->
+          <div class="modal fade" id="exampleModalAdd1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title" id="exampleModalLabelAdd1">Addition</h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Voulez-vous vraiment ajouter ce bordereau de règlement ?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                  <button type="button" class="btn yes" (click)="onUploadAdd(addForm)" data-bs-dismiss="modal">Oui</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <span *ngIf="btn == true" style="padding-left: 4em"></span>
+          <button *ngIf="btn == true"
+                  class="btn ssbb" style="width: 150px;" [disabled]="!selectedRow || addForm.form.invalid || checkfile==false ||  (bord==true && eqNom==false) || cloForBR == true || delete==false || delete == null"  data-bs-toggle="modal" data-bs-target="#exampleModalMod1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+              <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+            </svg>
+            Modifier</button>
+
+          <!-- Modal -->
+          <div class="modal fade" id="exampleModalMod1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title" id="exampleModalLabelMod1">Modification</h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Voulez-vous vraiment modifier ce bordereau de règlement ?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                  <button type="button" class="btn yes" (click)="onUploadUpdate(addForm)" data-bs-dismiss="modal">Oui</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <span *ngIf="btn == false" style="padding-left: 4em"></span>
+          <button *ngIf="btn == false"
+                  class="btn ssbb" style="width: 150px;" [disabled]="!selectedRow || addForm.form.invalid || cloForBR == true || (bord==true && eqNom==false)" data-bs-toggle="modal" data-bs-target="#exampleModalMod">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+              <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+            </svg>
+            Modifier</button>
+
+          <!-- Modal -->
+          <div class="modal fade" id="exampleModalMod" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title" id="exampleModalLabelMod">Modification</h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Voulez-vous vraiment modifier ce bordereau de règlement ?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                  <button type="button" class="btn yes" (click)="onUploadUpdateNoFile(addForm)" data-bs-dismiss="modal">Oui</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <span style="padding-left: 4em"></span>
+          <button class="btn ssee" style="width: 150px;" [disabled]="!selectedRow || addForm.form.invalid || cloForBR == true || btn == true"  data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+              <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+            </svg>
+            Supprimer</button>
+          <!-- Modal -->
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title" id="exampleModalLabel">Suppression</h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Voulez-vous vraiment supprimer ce bordereau de règlement ?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn stop" data-bs-dismiss="modal">Non</button>
+                  <button type="button" class="btn yes" (click)="onDelete(selectedRow.id,addForm)" data-bs-dismiss="modal">Oui</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span style="padding-left: 4em"></span><button style="width: 150px;" [disabled]="delete == true || btn == true" class="btn ssee" (click)="cancelClick(addForm)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+              <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+          </svg>
+          Réinitialiser</button>
+        </div>
+
+      </form>
+
+  </div>
+  <br><br>
+</div>
+
+<br>
